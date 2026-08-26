@@ -1,0 +1,9 @@
+[
+  {
+    "id": "planner",
+    "title": "Plan independent, parallelizable work items from the backlog",
+    "prompt": "Read .drover/backlog.md at the repository root — a freeform list of work a human wants done. Choose the subset of items that can be implemented completely independently of each other, without touching overlapping files (they will run in parallel on separate branches, and there is no merge step to resolve conflicts between them). For each chosen item, write a JSON array to .drover/plan.json at the repository root, where each entry is exactly: {\"id\": \"<short-kebab-case-id, unique, safe as a git branch segment>\", \"title\": \"<one-line title>\", \"description\": \"<full, self-contained instructions for whoever implements this item, since they will not see the backlog file>\"}. If nothing in the backlog can be safely parallelized, plan.json may contain a single item. If the backlog is empty or already fully addressed, write an empty array. Commit .drover/plan.json with a message describing how many items you selected. When finished, output exactly this string on its own line: PLAN_READY",
+    "completionSignal": "PLAN_READY",
+    "maxIterations": 3
+  }
+]

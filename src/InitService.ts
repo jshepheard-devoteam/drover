@@ -76,6 +76,12 @@ const TEMPLATES: TemplateMetadata[] = [
     usesBoard: true,
   },
   {
+    name: "parallel-planner-human-review",
+    description:
+      "Plans parallelizable backlog items, implements and reviews each on its own branch, stops short of merging — a human decides what lands",
+    usesBoard: true,
+  },
+  {
     name: "claude-plans-gpt-executes",
     description:
       "Two-model split — Claude Code plans and merges, Codex/GPT executes each issue in parallel",

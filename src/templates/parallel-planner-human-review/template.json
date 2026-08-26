@@ -1,0 +1,4 @@
+{
+  "name": "parallel-planner-human-review",
+  "description": "Plans parallelizable backlog items, implements and reviews each on its own branch, stops short of merging — a human decides what lands"
+}
