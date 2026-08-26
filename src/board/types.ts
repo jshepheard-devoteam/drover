@@ -138,4 +138,13 @@ export interface BoardOptions {
   /** Max chains processed concurrently. Default: 1. */
   readonly maxConcurrentChains?: number;
   readonly signal?: AbortSignal;
+  /**
+   * How a ticket's agent is actually invoked. `"sandbox"` (default) calls
+   * `sandbox.run()`/`sandbox.interactive()` headlessly, as today. `"herdr"`
+   * runs the agent directly on the host in a Herdr pane instead — requires
+   * `sandbox: noSandbox()` (checked at `startBoard`/`runOne` entry) and
+   * trades away container isolation for real observability; see
+   * docs/adr/0022-herdr-execution-is-host-native.md.
+   */
+  readonly execVia?: "herdr" | "sandbox";
 }

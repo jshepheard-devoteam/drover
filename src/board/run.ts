@@ -21,6 +21,8 @@ import {
   extractErrorTag,
 } from "./classify.js";
 import { openBoard, type BoardDb } from "./db.js";
+import { createHerdrClient, type HerdrClient } from "./herdr.js";
+import { classifyHerdrRun, runTicketInPane } from "./herdrRun.js";
 import type {
   Attempt,
   BoardOptions,
@@ -95,6 +97,26 @@ const unmetDeps = (ticket: Ticket, db: BoardDb): string[] =>
   ticket.deps.filter((depId) => db.getTicket(depId)?.status !== "done");
 
 /**
+ * Validates and prepares Herdr execution for one `startBoard()`/`runOne()`
+ * call. Returns `undefined` when `execVia` isn't `"herdr"` — the normal
+ * case. `Sandbox` doesn't carry its provider's tag, so this is the one place
+ * that can check "is this board actually using noSandbox()" — see ADR 0022.
+ */
+const setUpHerdrExecution = async (
+  options: BoardOptions,
+): Promise<HerdrClient | undefined> => {
+  if (options.execVia !== "herdr") return undefined;
+  if (options.sandbox.tag !== "none") {
+    throw new Error(
+      'execVia: "herdr" requires sandbox: noSandbox() — container isolation isn\'t supported for Herdr-executed tickets. See docs/adr/0022-herdr-execution-is-host-native.md.',
+    );
+  }
+  const herdr = createHerdrClient();
+  await herdr.preflight();
+  return herdr;
+};
+
+/**
  * Runs the pre-execution gate, if configured. Returns the prompt override to
  * use (if any) when the gate says to proceed, or `undefined` when the ticket
  * should not run this pass — the gate has already updated the ticket's
@@ -133,8 +155,51 @@ const attemptOnce = async (
   promptOverride: string | undefined,
   signal: AbortSignal | undefined,
   db: BoardDb,
+  execVia: "herdr" | "sandbox",
+  herdr: HerdrClient | undefined,
 ): Promise<ReturnType<typeof classify>> => {
   const startedAt = nowISO();
+
+  if (execVia === "herdr") {
+    try {
+      const result = await runTicketInPane({
+        herdr: herdr!,
+        sandbox,
+        ticket,
+        agent,
+        promptOverride,
+        signal,
+      });
+      const outcome = classifyHerdrRun(result);
+      db.recordAttempt({
+        ticketId: ticket.id,
+        n: attemptN,
+        startedAt,
+        endedAt: nowISO(),
+        outcome,
+        completionSignal: result.completionSignal,
+        commitShas: result.commits.map((c) => c.sha),
+        branch: sandbox.branch,
+        sessionId: result.sessionId,
+        stdoutTail: result.stdoutTail,
+      });
+      return outcome;
+    } catch (error) {
+      db.recordAttempt({
+        ticketId: ticket.id,
+        n: attemptN,
+        startedAt,
+        endedAt: nowISO(),
+        outcome: "failed",
+        commitShas: [],
+        branch: sandbox.branch,
+        errorTag: extractErrorTag(error),
+        errorMessage: extractErrorMessage(error),
+      });
+      return "failed";
+    }
+  }
+
   const runOptions = {
     ...buildRunOptions(ticket, agent, promptOverride),
     signal,
@@ -188,6 +253,7 @@ const runAutoTicket = async (
   options: BoardOptions,
   controller: AbortController,
   db: BoardDb,
+  herdr: HerdrClient | undefined,
 ): Promise<void> => {
   let attemptN = (db.lastAttempt(ticket.id)?.n ?? 0) + 1;
   let promptOverride: string | undefined;
@@ -217,6 +283,8 @@ const runAutoTicket = async (
       promptOverride,
       controller.signal,
       db,
+      options.execVia ?? "sandbox",
+      herdr,
     );
     if (outcome !== "needs_attempt" || attemptN >= ticket.maxAttempts) break;
     attemptN++;
@@ -241,6 +309,7 @@ const runChain = async (
   options: BoardOptions,
   controller: AbortController,
   db: BoardDb,
+  herdr: HerdrClient | undefined,
 ): Promise<void> => {
   const chain = db.listTicketsByChain(chainId);
   if (chain.some((t) => t.status === "running" && t.ownerPid !== process.pid))
@@ -300,7 +369,15 @@ const runChain = async (
       }
 
       if (!db.claim(ticket.id, process.pid)) continue;
-      await runAutoTicket(sandbox, ticket, chain, options, controller, db);
+      await runAutoTicket(
+        sandbox,
+        ticket,
+        chain,
+        options,
+        controller,
+        db,
+        herdr,
+      );
       const after = db.getTicket(ticket.id)!;
       if (after.status === "failed") break; // Chain halts on a hard failure.
     }
@@ -321,6 +398,7 @@ const runChain = async (
  * skip`. Fine for six tickets on a laptop; not a fleet scheduler.
  */
 export const startBoard = async (options: BoardOptions): Promise<void> => {
+  const herdr = await setUpHerdrExecution(options);
   const db = openBoard(options.dbPath);
   const pollIntervalMs = options.pollIntervalMs ?? 2000;
   const maxConcurrentChains = options.maxConcurrentChains ?? 1;
@@ -363,16 +441,27 @@ export const startBoard = async (options: BoardOptions): Promise<void> => {
             unmetDeps(t, db).length === 0,
         );
         if (!claimable) continue;
-        const run = runChain(chainId, options, controller, db).finally(() => {
-          inFlight.delete(chainId);
-        });
+        const run = runChain(chainId, options, controller, db, herdr).finally(
+          () => {
+            inFlight.delete(chainId);
+          },
+        );
         inFlight.set(chainId, run);
       }
 
-      await Promise.race([
-        Promise.allSettled(inFlight.values()),
-        new Promise((resolve) => setTimeout(resolve, pollIntervalMs)),
-      ]);
+      // `Promise.allSettled([])` resolves synchronously — racing it against
+      // the poll delay when nothing is in flight defeats the delay entirely
+      // and busy-spins the loop at CPU speed. Only race once there's
+      // something that could actually finish early; otherwise just wait out
+      // the poll interval.
+      if (inFlight.size > 0) {
+        await Promise.race([
+          Promise.allSettled(inFlight.values()),
+          new Promise((resolve) => setTimeout(resolve, pollIntervalMs)),
+        ]);
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+      }
     }
     await Promise.allSettled(inFlight.values());
   } finally {
@@ -393,6 +482,7 @@ export const runOne = async (
   ticketId: string,
   options: BoardOptions,
 ): Promise<void> => {
+  const herdr = await setUpHerdrExecution(options);
   const db = openBoard(options.dbPath);
   try {
     const ticket = db.getTicket(ticketId);
@@ -492,6 +582,8 @@ export const runOne = async (
         promptOverride,
         controller.signal,
         db,
+        options.execVia ?? "sandbox",
+        herdr,
       );
       db.setStatus(ticketId, outcome);
     } finally {

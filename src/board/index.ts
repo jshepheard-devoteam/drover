@@ -36,6 +36,22 @@ export {
 export { createHerdrLauncher } from "./herdrLauncher.js";
 export type { HerdrLauncherOptions } from "./herdrLauncher.js";
 
+export { classifyStartup, createHerdrClient } from "./herdr.js";
+export type {
+  AgentSnapshot,
+  AgentStatus,
+  HerdrClient,
+  HerdrWorkspace,
+} from "./herdr.js";
+export {
+  HerdrCommandError,
+  HerdrTimeoutError,
+  HerdrUnavailableError,
+} from "./herdr.js";
+
+export { classifyHerdrRun, herdrKindFor, runTicketInPane } from "./herdrRun.js";
+export type { HerdrRunResult } from "./herdrRun.js";
+
 export type {
   Attempt,
   BeforeRun,
