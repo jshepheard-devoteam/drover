@@ -7,6 +7,9 @@ import { SANDBOX_REPO_DIR } from "./SandboxFactory.js";
 const GITIGNORE = `.env
 logs/
 worktrees/
+board.sqlite
+board.sqlite-shm
+board.sqlite-wal
 `;
 
 /**
