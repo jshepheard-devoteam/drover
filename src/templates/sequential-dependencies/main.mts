@@ -1,6 +1,7 @@
+import { parseArgs } from "node:util";
 import { claudeCode } from "@devoteam/drover";
 import { docker } from "@devoteam/drover/sandboxes/docker";
-import { startBoard } from "@devoteam/drover/board";
+import { runOne, startBoard, type BoardOptions } from "@devoteam/drover/board";
 
 // Sequential dependencies: a durable ticket board that runs a set of tickets
 // in dependency order, one shared sandbox per chain of related tickets.
@@ -17,8 +18,10 @@ import { startBoard } from "@devoteam/drover/board";
 //        npx tsx .drover/main.mts
 //   3. From another terminal, at any time:
 //        npx drover-board status
+//   4. Retry a single failed/stuck ticket by hand:
+//        npx drover-board retry <id> && npx tsx .drover/main.mts --ticket <id>
 
-await startBoard({
+const boardOptions: BoardOptions = {
   // Where the board's SQLite state lives. Gitignored — board.json (checked
   // in) is the intent; this file is the runtime state derived from it.
   dbPath: "./.drover/board.sqlite",
@@ -42,4 +45,20 @@ await startBoard({
       onSandboxReady: [{ command: "npm install" }],
     },
   },
-});
+};
+
+// `--ticket <id>` runs exactly that ticket once via `runOne()` instead of
+// the daemon loop — the manual-retry entry point, and (with `--interactive`)
+// what a Herdr-launched pane actually executes for an interactive ticket.
+const { values } = parseArgs({
+  options: {
+    ticket: { type: "string" },
+    interactive: { type: "boolean", default: false },
+  },
+} as const);
+
+if (values.ticket) {
+  await runOne(values.ticket, boardOptions);
+} else {
+  await startBoard(boardOptions);
+}

@@ -33,6 +33,9 @@ export {
   buildRunOptions,
 } from "./run.js";
 
+export { createHerdrLauncher } from "./herdrLauncher.js";
+export type { HerdrLauncherOptions } from "./herdrLauncher.js";
+
 export type {
   Attempt,
   BeforeRun,

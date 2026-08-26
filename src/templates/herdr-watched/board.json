@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1-headless-setup",
+    "title": "Headless setup ticket",
+    "prompt": "Create a file named DROVER_HERDR_DEMO.md at the repository root containing exactly one line: 'headless setup done'. Commit it with the message 'drover: herdr demo setup'. When finished, output exactly this string on its own line: TICKET_COMPLETE",
+    "completionSignal": "TICKET_COMPLETE",
+    "maxIterations": 5
+  },
+  {
+    "id": "2-pair-with-me",
+    "title": "Interactive pairing session",
+    "deps": ["1-headless-setup"],
+    "mode": "interactive",
+    "prompt": "Read DROVER_HERDR_DEMO.md, say hello, and wait for the operator's instructions."
+  }
+]

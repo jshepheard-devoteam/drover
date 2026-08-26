@@ -1,6 +1,12 @@
+import { parseArgs } from "node:util";
 import { claudeCode } from "@devoteam/drover";
 import { docker } from "@devoteam/drover/sandboxes/docker";
-import { startBoard, type BeforeRun } from "@devoteam/drover/board";
+import {
+  runOne,
+  startBoard,
+  type BeforeRun,
+  type BoardOptions,
+} from "@devoteam/drover/board";
 
 // Grill-gated loop: a pre-execution interrogation gate runs before every
 // ticket attempt. It can approve a ticket as-is, rewrite its prompt before
@@ -12,6 +18,7 @@ import { startBoard, type BeforeRun } from "@devoteam/drover/board";
 //   npx drover-board load .drover/board.json
 //   npx tsx .drover/main.mts
 //   npx drover-board status   (from another terminal, at any time)
+//   npx drover-board retry <id> && npx tsx .drover/main.mts --ticket <id>  (retry one)
 
 // "bot": the gate below runs a synchronous heuristic critique and returns
 // proceed/reject on its own.
@@ -64,7 +71,7 @@ const beforeRun: BeforeRun = async (ctx) => {
   return { action: "proceed", promptOverride: sharpened, note: "Grill gate approved." };
 };
 
-await startBoard({
+const boardOptions: BoardOptions = {
   dbPath: "./.drover/board.sqlite",
   sandbox: docker(),
   agentFor: () => claudeCode("claude-sonnet-4-6"),
@@ -75,4 +82,19 @@ await startBoard({
       onSandboxReady: [{ command: "npm install" }],
     },
   },
-});
+};
+
+// `--ticket <id>` runs exactly that ticket once via `runOne()` — still
+// gated by `beforeRun` above — instead of the daemon loop.
+const { values } = parseArgs({
+  options: {
+    ticket: { type: "string" },
+    interactive: { type: "boolean", default: false },
+  },
+} as const);
+
+if (values.ticket) {
+  await runOne(values.ticket, boardOptions);
+} else {
+  await startBoard(boardOptions);
+}

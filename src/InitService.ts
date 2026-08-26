@@ -69,6 +69,12 @@ const TEMPLATES: TemplateMetadata[] = [
       "Durable ticket board gated by a pre-execution interrogation gate — approves, sharpens, rejects, or defers each ticket",
     usesBoard: true,
   },
+  {
+    name: "herdr-watched",
+    description:
+      "A ticket marked interactive hands off to a live Herdr pane instead of running headlessly",
+    usesBoard: true,
+  },
 ];
 
 export const listTemplates = (): TemplateMetadata[] => TEMPLATES;
