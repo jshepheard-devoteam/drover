@@ -9,11 +9,13 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
+import { createDashboardServer } from "./dashboard.js";
 import { openBoard } from "./db.js";
 import { loadBoard } from "./load.js";
 import type { TicketInput } from "./types.js";
 
 const DEFAULT_DB_PATH = ".drover/board.sqlite";
+const DEFAULT_DASHBOARD_PORT = 4400;
 
 const usage = `Usage:
   drover-board load <board.json> [--db <path>]
@@ -21,6 +23,7 @@ const usage = `Usage:
   drover-board retry <id> [--db <path>]
   drover-board skip <id> [--db <path>] [--note <text>]
   drover-board stop [--db <path>]
+  drover-board dashboard [--db <path>] [--port <n>]
 `;
 
 class CliUsageError extends Error {}
@@ -39,6 +42,7 @@ const main = (): void => {
       db: { type: "string", default: DEFAULT_DB_PATH },
       json: { type: "boolean", default: false },
       note: { type: "string" },
+      port: { type: "string", default: String(DEFAULT_DASHBOARD_PORT) },
     },
     allowPositionals: true,
   } as const);
@@ -143,6 +147,23 @@ const main = (): void => {
       } finally {
         db.close();
       }
+      return;
+    }
+
+    case "dashboard": {
+      const port = Number(values.port);
+      if (!Number.isInteger(port) || port <= 0) {
+        throw new CliUsageError(`Invalid --port: ${values.port}`);
+      }
+      const db = openBoard(values.db);
+      const server = createDashboardServer({ dbPath: values.db, db });
+      server.listen(port, "127.0.0.1", () => {
+        console.log(
+          `Dashboard running at http://127.0.0.1:${port} (read-only, Ctrl-C to stop)`,
+        );
+      });
+      // Deliberately no db.close()/return here — the listening server and
+      // open db handle are what keep the process alive.
       return;
     }
 

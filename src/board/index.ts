@@ -52,6 +52,15 @@ export {
 export { classifyHerdrRun, herdrKindFor, runTicketInPane } from "./herdrRun.js";
 export type { HerdrRunResult } from "./herdrRun.js";
 
+export { buildDashboardState, createDashboardServer } from "./dashboard.js";
+export type {
+  DashboardAttemptSummary,
+  DashboardChain,
+  DashboardServerOptions,
+  DashboardState,
+  DashboardTicket,
+} from "./dashboard.js";
+
 export type {
   Attempt,
   BeforeRun,
