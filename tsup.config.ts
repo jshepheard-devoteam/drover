@@ -9,6 +9,8 @@ export default defineConfig({
   entry: {
     index: "src/index.ts",
     main: "src/main.ts",
+    board: "src/board/index.ts",
+    "board-cli": "src/board/cli.ts",
     "sandboxes/docker": "src/sandboxes/docker.ts",
     "sandboxes/podman": "src/sandboxes/podman.ts",
     "sandboxes/vercel": "src/sandboxes/vercel.ts",

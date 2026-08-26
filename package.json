@@ -10,6 +10,10 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./board": {
+      "import": "./dist/board.js",
+      "types": "./dist/board.d.ts"
+    },
     "./sandboxes/docker": {
       "import": "./dist/sandboxes/docker.js",
       "types": "./dist/sandboxes/docker.d.ts"
@@ -32,7 +36,8 @@
     }
   },
   "bin": {
-    "drover": "dist/main.js"
+    "drover": "dist/main.js",
+    "drover-board": "dist/board-cli.js"
   },
   "scripts": {
     "build": "tsup",
