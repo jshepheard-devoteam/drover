@@ -27,6 +27,8 @@ export interface TemplateMetadata {
    * `npx tsx .drover/main.ts` doesn't crash with ERR_MODULE_NOT_FOUND.
    */
   dependencies?: readonly string[];
+  /** True for templates built on `startBoard()`/`runOne()` (`@devoteam/drover/board`) — they ship a `board.json` that must be `drover-board load`ed before the daemon has anything to run. */
+  usesBoard?: boolean;
 }
 
 const TEMPLATES: TemplateMetadata[] = [
@@ -54,6 +56,12 @@ const TEMPLATES: TemplateMetadata[] = [
     description:
       "Plans parallelizable issues, executes with per-branch review, merges",
     dependencies: ["zod"],
+  },
+  {
+    name: "sequential-dependencies",
+    description:
+      "Durable ticket board — runs tickets in dependency order, retrying automatically until each one finishes",
+    usesBoard: true,
   },
 ];
 
@@ -660,6 +668,8 @@ export function getNextStepsLines(
   } else {
     const hasReviewer = template.includes("review");
     const usesPlanSchema = getTemplateDependencies(template).includes("zod");
+    const usesBoard =
+      TEMPLATES.find((t) => t.name === template)?.usesBoard ?? false;
     let step = 1;
     const lines: string[] = [
       "Next steps:",
@@ -687,7 +697,16 @@ export function getNextStepsLines(
         `${step++}. Customize .drover/CODING_STANDARDS.md with your project's standards — the reviewer agent loads it during review`,
       );
     }
-    lines.push(`${step++}. Run \`npm run drover\` to start the agent`);
+    if (usesBoard) {
+      lines.push(
+        `${step++}. Seed the tickets in .drover/board.json into durable state: \`npx drover-board load .drover/board.json\``,
+      );
+      lines.push(
+        `${step++}. Run \`npm run drover\` to start the daemon — it exits once every ticket has settled. Check progress from another terminal at any time: \`npx drover-board status\``,
+      );
+    } else {
+      lines.push(`${step++}. Run \`npm run drover\` to start the agent`);
+    }
     return lines;
   }
 }

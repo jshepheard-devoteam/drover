@@ -1,0 +1,4 @@
+{
+  "name": "sequential-dependencies",
+  "description": "Durable ticket board — runs tickets in dependency order, retrying automatically until each one finishes"
+}

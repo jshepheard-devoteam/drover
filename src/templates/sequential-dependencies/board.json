@@ -1,0 +1,25 @@
+[
+  {
+    "id": "1-create-log",
+    "title": "Create the demo log file",
+    "prompt": "Create a file named DROVER_CHAIN_DEMO.md at the repository root containing exactly one line: 'step 1 done'. Commit it with the message 'drover: step 1'. When finished, output exactly this string on its own line: TICKET_COMPLETE",
+    "completionSignal": "TICKET_COMPLETE",
+    "maxIterations": 5
+  },
+  {
+    "id": "2-append-log",
+    "title": "Append to the demo log file",
+    "deps": ["1-create-log"],
+    "prompt": "Append a new line to DROVER_CHAIN_DEMO.md at the repository root reading 'step 2 done'. Commit it with the message 'drover: step 2'. When finished, output exactly this string on its own line: TICKET_COMPLETE",
+    "completionSignal": "TICKET_COMPLETE",
+    "maxIterations": 5
+  },
+  {
+    "id": "3-finish-log",
+    "title": "Finish the demo log file",
+    "deps": ["2-append-log"],
+    "prompt": "Append a final line to DROVER_CHAIN_DEMO.md at the repository root reading 'step 3 done — chain complete'. Commit it with the message 'drover: step 3'. When finished, output exactly this string on its own line: TICKET_COMPLETE",
+    "completionSignal": "TICKET_COMPLETE",
+    "maxIterations": 5
+  }
+]
