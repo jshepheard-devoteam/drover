@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1-well-specified",
+    "title": "Add a demo file",
+    "prompt": "Create a file named DROVER_GRILL_DEMO.md at the repository root containing exactly one line: 'grill gate approved this ticket'. Commit it with the message 'drover: grill demo'. When finished, output exactly this string on its own line: TICKET_COMPLETE",
+    "completionSignal": "TICKET_COMPLETE",
+    "maxIterations": 5
+  },
+  {
+    "id": "2-too-vague",
+    "title": "fix stuff",
+    "prompt": "fix it",
+    "completionSignal": "TICKET_COMPLETE",
+    "maxIterations": 5
+  }
+]

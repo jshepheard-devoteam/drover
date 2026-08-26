@@ -6,7 +6,29 @@ import { classify, classifyInteractive, extractErrorTag } from "./classify.js";
 import { computeChains } from "./chains.js";
 import { openBoard, type BoardDb } from "./db.js";
 import { loadBoard } from "./load.js";
-import type { TicketInput } from "./types.js";
+import { buildRunOptions } from "./run.js";
+import type { AgentProvider } from "../AgentProvider.js";
+import type { Ticket, TicketInput } from "./types.js";
+
+const stubAgent = {} as AgentProvider;
+
+const baseTicket: Ticket = {
+  id: "t1",
+  title: "T1",
+  prompt: "original prompt",
+  deps: [],
+  mode: "auto",
+  chainId: "t1",
+  seq: 0,
+  maxIterations: 3,
+  maxAttempts: 3,
+  completionSignal: "DONE",
+  status: "pending",
+  ownerPid: null,
+  gateState: null,
+  gateNote: null,
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
 
 describe("classify", () => {
   it("threw -> failed", () => {
@@ -81,6 +103,38 @@ describe("extractErrorTag", () => {
 
   it("falls back to UnknownError for a non-object throw", () => {
     expect(extractErrorTag("boom")).toBe("UnknownError");
+  });
+});
+
+describe("buildRunOptions", () => {
+  it("uses the ticket's own prompt when there is no override", () => {
+    const options = buildRunOptions(baseTicket, stubAgent);
+    expect(options.prompt).toBe("original prompt");
+    expect(options.promptFile).toBeUndefined();
+  });
+
+  it("falls back to promptFile when the ticket has no inline prompt", () => {
+    const ticket: Ticket = {
+      ...baseTicket,
+      prompt: undefined,
+      promptFile: "./x.md",
+    };
+    const options = buildRunOptions(ticket, stubAgent);
+    expect(options.promptFile).toBe("./x.md");
+    expect(options.prompt).toBeUndefined();
+  });
+
+  it("a gate's promptOverride is delivered as a literal inline prompt, never combined with promptArgs (ADR 0008)", () => {
+    const options = buildRunOptions(
+      baseTicket,
+      stubAgent,
+      "rewritten by the gate: {{NOT_A_TEMPLATE_ARG}}",
+    );
+    expect(options.prompt).toBe(
+      "rewritten by the gate: {{NOT_A_TEMPLATE_ARG}}",
+    );
+    expect(options.promptFile).toBeUndefined();
+    expect("promptArgs" in options).toBe(false);
   });
 });
 

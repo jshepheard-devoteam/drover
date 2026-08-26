@@ -66,7 +66,16 @@ export const buildContinuationPrompt = (
   return lines.join("\n\n");
 };
 
-const buildRunOptions = (
+/**
+ * Builds the options for one `sandbox.run()` attempt. A gate's
+ * `promptOverride` — or a retry's continuation prompt — is always delivered
+ * as an inline `prompt`, never combined with `promptArgs`: per ADR 0008,
+ * inline prompts pass through to the agent literally, and Sandcastle treats
+ * `prompt` + `promptArgs` together as an error. The gate/retry machinery
+ * therefore does its own interpolation in JS rather than relying on
+ * Sandcastle's `{{KEY}}` substitution.
+ */
+export const buildRunOptions = (
   ticket: Ticket,
   agent: AgentProvider,
   promptOverride?: string,

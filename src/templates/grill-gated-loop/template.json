@@ -1,0 +1,4 @@
+{
+  "name": "grill-gated-loop",
+  "description": "Durable ticket board gated by a pre-execution interrogation gate — approves, sharpens, rejects, or defers each ticket before an agent ever sees it"
+}

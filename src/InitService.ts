@@ -63,6 +63,12 @@ const TEMPLATES: TemplateMetadata[] = [
       "Durable ticket board — runs tickets in dependency order, retrying automatically until each one finishes",
     usesBoard: true,
   },
+  {
+    name: "grill-gated-loop",
+    description:
+      "Durable ticket board gated by a pre-execution interrogation gate — approves, sharpens, rejects, or defers each ticket",
+    usesBoard: true,
+  },
 ];
 
 export const listTemplates = (): TemplateMetadata[] => TEMPLATES;

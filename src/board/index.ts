@@ -26,7 +26,12 @@ export type { BoardDb, TicketSeed } from "./db.js";
 export { loadBoard } from "./load.js";
 export type { LoadResult } from "./load.js";
 
-export { startBoard, runOne, buildContinuationPrompt } from "./run.js";
+export {
+  startBoard,
+  runOne,
+  buildContinuationPrompt,
+  buildRunOptions,
+} from "./run.js";
 
 export type {
   Attempt,
