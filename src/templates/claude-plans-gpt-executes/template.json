@@ -1,0 +1,5 @@
+{
+  "name": "claude-plans-gpt-executes",
+  "description": "Two-model split — Claude Code plans and merges, Codex/GPT executes each issue in parallel",
+  "dependencies": ["zod"]
+}

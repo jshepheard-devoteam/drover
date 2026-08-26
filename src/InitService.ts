@@ -75,6 +75,12 @@ const TEMPLATES: TemplateMetadata[] = [
       "A ticket marked interactive hands off to a live Herdr pane instead of running headlessly",
     usesBoard: true,
   },
+  {
+    name: "claude-plans-gpt-executes",
+    description:
+      "Two-model split — Claude Code plans and merges, Codex/GPT executes each issue in parallel",
+    dependencies: ["zod"],
+  },
 ];
 
 export const listTemplates = (): TemplateMetadata[] => TEMPLATES;
