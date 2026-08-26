@@ -1,12 +1,11 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import * as sandcastle from "@ai-hero/sandcastle";
-import { noSandbox } from "@ai-hero/sandcastle/sandboxes/no-sandbox";
+import * as drover from "@devoteam/drover";
+import { noSandbox } from "@devoteam/drover/sandboxes/no-sandbox";
 import {
   claudeAgent,
   fail,
   required,
-  sh,
   writeJson,
   writeText,
 } from "../shared/common";
@@ -14,7 +13,7 @@ import { fetchPullRequestContext } from "../shared/review-context";
 import {
   filterInlineComments,
   filterReplies,
-  reviewOutputSchema,
+  implementPrOutputSchema,
 } from "../shared/review-output";
 import { runWithExtraction } from "../shared/run-with-extraction";
 
@@ -25,7 +24,7 @@ try {
   const context = fetchPullRequestContext(PR_NUMBER);
 
   const result = await runWithExtraction({
-    name: `review-pr-${PR_NUMBER}`,
+    name: `implement-pr-${PR_NUMBER}`,
     agent: claudeAgent(),
     sandbox: noSandbox(),
     logging: { type: "stdout" },
@@ -40,9 +39,9 @@ try {
       DIFF_TO_MAIN: context.diff,
       PR_COMMENTS_JSON: context.prCommentsJson,
     },
-    output: sandcastle.Output.object({
+    output: drover.Output.object({
       tag: "output",
-      schema: reviewOutputSchema,
+      schema: implementPrOutputSchema,
     }),
     extractionPrompt: fs.readFileSync(
       path.join(import.meta.dirname, "extraction.md"),
@@ -50,35 +49,38 @@ try {
     ),
   });
 
-  const validInlineComments = filterInlineComments(
-    result.output.inlineComments,
-    context.diffLines,
-  );
-  const validReplies = filterReplies(
-    result.output.replies,
+  const threadReplies = filterReplies(
+    result.output.threadReplies,
     context.validReplyIds,
   );
-  const headSha = sh("git rev-parse HEAD").trim();
+  const newInlineComments = filterInlineComments(
+    result.output.newInlineComments,
+    context.diffLines,
+  );
+  const hasCommits = result.commits.length > 0;
 
-  writeJson("review_payload.json", {
-    commit_id: headSha,
-    event: "COMMENT",
-    body: result.output.summary,
-    comments: validInlineComments.map((comment) => ({
-      path: comment.path,
-      line: comment.line,
-      side: "RIGHT",
-      body: comment.body,
-    })),
-  });
-  writeJson("replies.json", validReplies);
-  writeText("summary.md", result.output.summary);
-  writeText("verdict.txt", result.commits.length > 0 ? "improved" : "clean");
+  if (
+    !hasCommits &&
+    threadReplies.length === 0 &&
+    newInlineComments.length === 0 &&
+    result.output.topLevelComments.length === 0
+  ) {
+    fail("Agent finished but made no commits and emitted no comments.");
+  }
 
-  console.log("Review complete.");
+  writeText("has_commits.txt", hasCommits ? "true" : "false");
+  writeJson("implement_thread_replies.json", threadReplies);
+  writeJson("implement_new_inline_comments.json", newInlineComments);
+  writeJson(
+    "implement_top_level_comments.json",
+    result.output.topLevelComments,
+  );
+
+  console.log("Implement PR complete.");
   console.log(`Commits: ${result.commits.length}.`);
-  console.log(`Inline comments: ${validInlineComments.length}.`);
-  console.log(`Replies: ${validReplies.length}.`);
+  console.log(`Thread replies: ${threadReplies.length}.`);
+  console.log(`Inline comments: ${newInlineComments.length}.`);
+  console.log(`Top-level comments: ${result.output.topLevelComments.length}.`);
 } catch (error) {
   fail(error instanceof Error ? error.message : String(error));
 }

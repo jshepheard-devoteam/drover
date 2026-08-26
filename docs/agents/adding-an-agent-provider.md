@@ -4,7 +4,7 @@ This document is for contributors adding support for a new **agent** (e.g. Claud
 
 1. [Evaluating a new agent](#evaluating-a-new-agent) — the questionnaire used to decide whether an agent's CLI can be supported.
 2. [The `AgentProvider` interface](#the-agentprovider-interface) — what you implement.
-3. [Scaffold integration](#scaffold-integration) — what `sandcastle init` needs to offer the agent.
+3. [Scaffold integration](#scaffold-integration) — what `drover init` needs to offer the agent.
 4. [Implementation checklist](#implementation-checklist) — every file to touch.
 
 For terminology (**agent**, **agent provider**, **sandbox**, etc.), see [`CONTEXT.md`](../../CONTEXT.md).
@@ -15,7 +15,7 @@ Before implementing, confirm the agent's CLI satisfies the must-haves below. If 
 
 ### Must-have CLI capabilities
 
-- **Non-interactive run mode.** A flag (often `--print`, `exec`, `run`) that takes a prompt, runs the agent to completion, and exits. Without this, Sandcastle cannot drive the agent unattended.
+- **Non-interactive run mode.** A flag (often `--print`, `exec`, `run`) that takes a prompt, runs the agent to completion, and exits. Without this, Drover cannot drive the agent unattended.
 - **Prompt input via argv or stdin.** stdin is strongly preferred — Linux caps `argv` at ~128 KB, which large prompts blow past.
 - **Auto-approval / bypass-permissions flag.** The agent runs inside a **sandbox**, so any "are you sure?" prompts will hang it. Examples: Claude Code's `--dangerously-skip-permissions`, Codex's `--dangerously-bypass-approvals-and-sandbox`.
 - **Model selection.** A flag that picks the model (e.g. `--model`, `-m`).
@@ -41,20 +41,20 @@ Resume support is a hard requirement for new **agent providers** ([ADR 0012](../
 
 - **Resume-by-session-ID flag.** A flag that takes a previously emitted session ID and continues that session (e.g. `claude --resume <id>`, `codex exec resume <id>`, `pi --session <id>`, `opencode run --session <id>`).
 - **Session-ID round-trip stability.** The session ID emitted in the stream during a fresh run is the same string the resume flag accepts back. If the CLI mints a new ID per invocation but only persists the file/row, resume cannot work — verify the round-trip empirically before starting implementation.
-- **Filesystem-backed session storage.** The agent writes its conversation record to files addressable by session ID (for example JSONL rollout files) so Sandcastle can transfer them between **host** and **sandbox**. Agents whose session state only exists in a local database are not resumable; see [ADR 0016](../adr/0016-resume-requires-filesystem-backed-sessions.md).
+- **Filesystem-backed session storage.** The agent writes its conversation record to files addressable by session ID (for example JSONL rollout files) so Drover can transfer them between **host** and **sandbox**. Agents whose session state only exists in a local database are not resumable; see [ADR 0016](../adr/0016-resume-requires-filesystem-backed-sessions.md).
 
 If any of these is missing, the agent likely cannot be supported until its CLI changes.
 
 ### Optional capabilities
 
-These unlock extra Sandcastle features but are not required:
+These unlock extra Drover features but are not required:
 
 - **Per-iteration token usage.** Token counts (input, output, cache create, cache read) surfaced either in the session log (parsed via `parseSessionUsage`, e.g. Claude Code) or in a stream event (emitted as a `usage` `ParsedStreamEvent`, e.g. Codex's `turn.completed`). Powers the usage display. Stream-sourced usage works even when session capture is off.
 - **Interactive mode.** A separate invocation form for human use (`interactive()`). If the agent has a TUI, expose it via `buildInteractiveArgs`.
 
 ### Scaffold prerequisites
 
-For `sandcastle init` to offer the agent:
+For `drover init` to offer the agent:
 
 - A reproducible install command (npm package, install script, etc.) that works inside a Debian-based Docker image.
 - A documented set of env vars for auth.
@@ -81,11 +81,11 @@ Field by field:
 
 - `name` — short identifier (e.g. `"claude-code"`, `"codex"`). Used in logs and config.
 - `env` — environment variables injected into the **sandbox** when this agent runs. Auth keys live here. Merged with the env resolver and **sandbox provider** env at launch.
-- `captureSessions` — user-facing kill-switch. When `true` (default), Sandcastle records the agent's session log per **iteration** and is able to resume it. Expose this on the provider's `Options` interface so users can opt out.
+- `captureSessions` — user-facing kill-switch. When `true` (default), Drover records the agent's session log per **iteration** and is able to resume it. Expose this on the provider's `Options` interface so users can opt out.
 - `sessionStorage` — provider-owned object that describes where and how the agent's session record is persisted ([ADR 0012](../adr/0012-agent-provider-owned-session-storage.md)). See [`AgentSessionStorage`](#agentsessionstorage) below. Omit for providers that do not support resume.
 - `buildPrintCommand({ prompt, dangerouslySkipPermissions, resumeSession })` — returns the shell command to run the agent non-interactively. Return `{ command, stdin }` when piping the prompt via stdin (preferred for large prompts). When `resumeSession` is set, append the agent's native resume CLI flag.
 - `buildInteractiveArgs(options)` — optional. Returns the argv array for `interactive()`. Omit if the agent has no TUI.
-- `parseStreamLine(line)` — given one line of stdout, return zero or more `ParsedStreamEvent`s. Event types: `text`, `result`, `tool_call`, `session_id`, `usage`. Return `[]` for lines you can't or don't need to parse. **Emitting `session_id` is required** — without it, Sandcastle cannot capture the session for resume. Emit `usage` if the stream carries token counts (e.g. Codex's `turn.completed`); it feeds the usage display without needing session capture.
+- `parseStreamLine(line)` — given one line of stdout, return zero or more `ParsedStreamEvent`s. Event types: `text`, `result`, `tool_call`, `session_id`, `usage`. Return `[]` for lines you can't or don't need to parse. **Emitting `session_id` is required** — without it, Drover cannot capture the session for resume. Emit `usage` if the stream carries token counts (e.g. Codex's `turn.completed`); it feeds the usage display without needing session capture.
 - `parseSessionUsage(content)` — optional. Given the session log content, return token usage for the most recent iteration. Currently only Claude Code implements this.
 
 ### `AgentSessionStorage`
@@ -118,7 +118,7 @@ interface AgentSessionStorage {
 - `readHostSession` — read a captured session JSONL from the host. Returns `undefined` when no session with that id exists. Used to parse per-iteration token usage.
 - `existsOnHost` — pre-flight check used by `run()` and `createWorktree()` to validate `resumeSession` before launching.
 - `hostSessionFilePath` — the on-disk path of the session, surfaced to callers via `OrchestrateResult.sessionFilePath`. Synchronous: file-backed stores that can derive the path from `(cwd, sessionId)` return it directly; otherwise return the path cached by `captureToHost`. Future SQLite-backed stores would return `undefined`.
-- `findByIdOnHost` — locate a session on the **host** by its unique id, independent of cwd encoding. Used by the no-sandbox resume precheck, where the agent runs on the **host** and writes the session in place under a cwd-derived directory Sandcastle cannot reliably reconstruct.
+- `findByIdOnHost` — locate a session on the **host** by its unique id, independent of cwd encoding. Used by the no-sandbox resume precheck, where the agent runs on the **host** and writes the session in place under a cwd-derived directory Drover cannot reliably reconstruct.
 
 ## Resume support (required)
 
@@ -140,7 +140,7 @@ Before writing code, **verify session-ID round-trip stability empirically**: run
 
 ## Scaffold integration
 
-For the agent to appear in `sandcastle init`, add an entry to `AGENT_REGISTRY` in [`src/InitService.ts`](../../src/InitService.ts):
+For the agent to appear in `drover init`, add an entry to `AGENT_REGISTRY` in [`src/InitService.ts`](../../src/InitService.ts):
 
 ```ts
 {

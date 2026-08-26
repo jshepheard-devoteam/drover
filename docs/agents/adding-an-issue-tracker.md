@@ -1,19 +1,19 @@
 # Adding an issue tracker
 
-This document is for contributors adding support for a new **issue tracker** (e.g. GitHub Issues, Beads, Jira, GitLab) to `sandcastle init`. It covers:
+This document is for contributors adding support for a new **issue tracker** (e.g. GitHub Issues, Beads, Jira, GitLab) to `drover init`. It covers:
 
 1. [Evaluating a new issue tracker](#evaluating-a-new-issue-tracker) — the questionnaire used to decide whether an issue tracker can be supported.
 2. [The `IssueTrackerEntry` shape](#the-issuetrackerentry-shape) — what you fill in.
-3. [Scaffold integration](#scaffold-integration) — how the entry plugs into `sandcastle init`.
+3. [Scaffold integration](#scaffold-integration) — how the entry plugs into `drover init`.
 4. [Implementation checklist](#implementation-checklist) — every file to touch.
 
 For terminology (**issue tracker**, **task**, **template argument**, etc.), see [`CONTEXT.md`](../../CONTEXT.md).
 
 ## What an issue tracker integration actually is
 
-Sandcastle does not embed any issue tracker itself. An issue-tracker entry is a **scaffold template**: when a user picks it during `sandcastle init`, we substitute three CLI commands (`LIST_TASKS_COMMAND`, `VIEW_TASK_COMMAND`, `CLOSE_TASK_COMMAND`) into the generated prompt files, and we drop a Dockerfile snippet that installs the relevant CLI into the **sandbox**.
+Drover does not embed any issue tracker itself. An issue-tracker entry is a **scaffold template**: when a user picks it during `drover init`, we substitute three CLI commands (`LIST_TASKS_COMMAND`, `VIEW_TASK_COMMAND`, `CLOSE_TASK_COMMAND`) into the generated prompt files, and we drop a Dockerfile snippet that installs the relevant CLI into the **sandbox**.
 
-The generated project then runs those commands itself — Sandcastle is not in the loop at runtime.
+The generated project then runs those commands itself — Drover is not in the loop at runtime.
 
 This means the requirements below are about what the **CLI** can do unattended inside a Debian-based container, not about what the issue tracker can do as a product.
 
@@ -43,7 +43,7 @@ Before implementing, confirm the issue tracker satisfies the must-haves below. I
 
 ### Scaffold prerequisites
 
-For `sandcastle init` to offer the issue tracker:
+For `drover init` to offer the issue tracker:
 
 - A Dockerfile snippet that installs the CLI as root (before any `USER` switch in the agent provider's Dockerfile).
 - A token env var to surface in `.env.example`, or an empty string if no auth is required (Beads is the local-only example).

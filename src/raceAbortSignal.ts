@@ -11,7 +11,7 @@ import { Deferred, Effect } from "effect";
  *
  * Uses `Effect.die` so the abort reason propagates as a defect — callers
  * should use `signal.throwIfAborted()` in their catch handler to surface
- * the original reason without Sandcastle-specific wrapping.
+ * the original reason without Drover-specific wrapping.
  *
  * The abort listener is always cleaned up, even when the effect wins the race.
  */

@@ -17,7 +17,7 @@ export const buildRecoveryMessage = (input: RecoveryInput): string => {
   const { patchDir, failedStep, hasCommits, hasDiff, hasUntracked, branch } =
     input;
 
-  // When --branch is set, commands run inside .sandcastle/worktree,
+  // When --branch is set, commands run inside .drover/worktree,
   // so patch paths need ../../ prefix to reach repo root
   const cmdPatchDir = branch ? `../../${patchDir}` : patchDir;
 
@@ -45,8 +45,8 @@ export const buildRecoveryMessage = (input: RecoveryInput): string => {
     lines.push("Set up worktree, then resolve:");
     lines.push(
       formatCommandBlock([
-        `git worktree add .sandcastle/worktree ${branch}`,
-        `cd .sandcastle/worktree`,
+        `git worktree add .drover/worktree ${branch}`,
+        `cd .drover/worktree`,
       ]),
     );
     lines.push("");

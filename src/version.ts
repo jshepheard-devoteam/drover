@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 
-declare const __SANDCASTLE_VERSION__: string | undefined;
+declare const __DROVER_VERSION__: string | undefined;
 
 const fallbackVersion = (): string => {
   const require = createRequire(import.meta.url);
@@ -14,6 +14,6 @@ const fallbackVersion = (): string => {
  * is undefined, so we fall back to reading `package.json` at runtime.
  */
 export const VERSION: string =
-  typeof __SANDCASTLE_VERSION__ !== "undefined"
-    ? __SANDCASTLE_VERSION__
+  typeof __DROVER_VERSION__ !== "undefined"
+    ? __DROVER_VERSION__
     : fallbackVersion();

@@ -12,11 +12,11 @@ const runResolveEnv = (dir: string) =>
   Effect.runPromise(resolveEnv(dir).pipe(Effect.provide(NodeContext.layer)));
 
 describe("resolveEnv", () => {
-  it("returns all key-value pairs from .sandcastle/.env", async () => {
+  it("returns all key-value pairs from .drover/.env", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
+    await mkdir(join(dir, ".drover"));
     await writeFile(
-      join(dir, ".sandcastle", ".env"),
+      join(dir, ".drover", ".env"),
       "ANTHROPIC_API_KEY=sc-key\nGH_TOKEN=sc-gh\n",
     );
 
@@ -40,26 +40,26 @@ describe("resolveEnv", () => {
     expect(env).toEqual({});
   });
 
-  it("root .env is ignored even when .sandcastle/.env also exists", async () => {
+  it("root .env is ignored even when .drover/.env also exists", async () => {
     const dir = await makeDir();
     await writeFile(join(dir, ".env"), "ROOT_ONLY=root-val\nSHARED=root\n");
-    await mkdir(join(dir, ".sandcastle"));
+    await mkdir(join(dir, ".drover"));
     await writeFile(
-      join(dir, ".sandcastle", ".env"),
+      join(dir, ".drover", ".env"),
       "SC_ONLY=sc-val\nSHARED=sc\n",
     );
 
     const env = await runResolveEnv(dir);
     expect(env["ROOT_ONLY"]).toBeUndefined();
     expect(env["SC_ONLY"]).toBe("sc-val");
-    expect(env["SHARED"]).toBe("sc"); // only .sandcastle/.env is used
+    expect(env["SHARED"]).toBe("sc"); // only .drover/.env is used
   });
 
-  it("falls back to process.env for keys declared in .sandcastle/.env", async () => {
+  it("falls back to process.env for keys declared in .drover/.env", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    // .sandcastle/.env declares the key but with empty value
-    await writeFile(join(dir, ".sandcastle", ".env"), "MY_TOKEN=\n");
+    await mkdir(join(dir, ".drover"));
+    // .drover/.env declares the key but with empty value
+    await writeFile(join(dir, ".drover", ".env"), "MY_TOKEN=\n");
 
     const orig = process.env["MY_TOKEN"];
     try {
@@ -72,10 +72,10 @@ describe("resolveEnv", () => {
     }
   });
 
-  it("does NOT pull keys from process.env that are not in .sandcastle/.env", async () => {
+  it("does NOT pull keys from process.env that are not in .drover/.env", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(join(dir, ".sandcastle", ".env"), "DECLARED_KEY=value\n");
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), "DECLARED_KEY=value\n");
 
     // PATH is always in process.env but should not appear in result
     const env = await runResolveEnv(dir);
@@ -84,10 +84,10 @@ describe("resolveEnv", () => {
     expect(env["DECLARED_KEY"]).toBe("value");
   });
 
-  it(".sandcastle/.env takes precedence over process.env", async () => {
+  it(".drover/.env takes precedence over process.env", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(join(dir, ".sandcastle", ".env"), "MY_VAR=sc-val\n");
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), "MY_VAR=sc-val\n");
 
     const orig = process.env["MY_VAR"];
     try {
@@ -106,11 +106,11 @@ describe("resolveEnv", () => {
     expect(env).toEqual({});
   });
 
-  it("ignores comments and blank lines in .sandcastle/.env", async () => {
+  it("ignores comments and blank lines in .drover/.env", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
+    await mkdir(join(dir, ".drover"));
     await writeFile(
-      join(dir, ".sandcastle", ".env"),
+      join(dir, ".drover", ".env"),
       "# This is a comment\n\nKEY1=val1\n\n# Another comment\nKEY2=val2\n",
     );
 
@@ -118,12 +118,12 @@ describe("resolveEnv", () => {
     expect(env).toEqual({ KEY1: "val1", KEY2: "val2" });
   });
 
-  it("does no validation — returns whatever keys are present in .sandcastle/.env", async () => {
+  it("does no validation — returns whatever keys are present in .drover/.env", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
+    await mkdir(join(dir, ".drover"));
     // Only custom keys, no ANTHROPIC_API_KEY or GH_TOKEN
     await writeFile(
-      join(dir, ".sandcastle", ".env"),
+      join(dir, ".drover", ".env"),
       "NPM_TOKEN=npm123\nDATABASE_URL=pg://localhost\n",
     );
 
@@ -136,9 +136,9 @@ describe("resolveEnv", () => {
 
   it("strips matching double quotes from values", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
+    await mkdir(join(dir, ".drover"));
     await writeFile(
-      join(dir, ".sandcastle", ".env"),
+      join(dir, ".drover", ".env"),
       'ANTHROPIC_API_KEY="sk-ant-api03-real-key"\n',
     );
 
@@ -148,8 +148,8 @@ describe("resolveEnv", () => {
 
   it("strips matching single quotes from values", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(join(dir, ".sandcastle", ".env"), "TOKEN='my-token'\n");
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), "TOKEN='my-token'\n");
 
     const env = await runResolveEnv(dir);
     expect(env["TOKEN"]).toBe("my-token");
@@ -157,8 +157,8 @@ describe("resolveEnv", () => {
 
   it("leaves mismatched quotes as-is", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(join(dir, ".sandcastle", ".env"), `KEY="value'\n`);
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), `KEY="value'\n`);
 
     const env = await runResolveEnv(dir);
     expect(env["KEY"]).toBe(`"value'`);
@@ -166,8 +166,8 @@ describe("resolveEnv", () => {
 
   it("leaves interior quotes as-is", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(join(dir, ".sandcastle", ".env"), 'KEY=some"thing\n');
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), 'KEY=some"thing\n');
 
     const env = await runResolveEnv(dir);
     expect(env["KEY"]).toBe('some"thing');
@@ -175,17 +175,17 @@ describe("resolveEnv", () => {
 
   it("handles empty quoted values", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(join(dir, ".sandcastle", ".env"), 'KEY=""\n');
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), 'KEY=""\n');
 
     const env = await runResolveEnv(dir);
     expect(env).toEqual({});
   });
 
-  it("process.env fallback works for keys in .sandcastle/.env too", async () => {
+  it("process.env fallback works for keys in .drover/.env too", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(join(dir, ".sandcastle", ".env"), "FALLBACK_KEY=\n");
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), "FALLBACK_KEY=\n");
 
     const orig = process.env["FALLBACK_KEY"];
     try {
@@ -200,11 +200,8 @@ describe("resolveEnv", () => {
 
   it("unescapes \\n in double-quoted values", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(
-      join(dir, ".sandcastle", ".env"),
-      'KEY="line1\\nline2"\n',
-    );
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), 'KEY="line1\\nline2"\n');
 
     const env = await runResolveEnv(dir);
     expect(env["KEY"]).toBe("line1\nline2");
@@ -212,11 +209,8 @@ describe("resolveEnv", () => {
 
   it("does not unescape \\n in single-quoted values", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(
-      join(dir, ".sandcastle", ".env"),
-      "KEY='line1\\nline2'\n",
-    );
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), "KEY='line1\\nline2'\n");
 
     const env = await runResolveEnv(dir);
     expect(env["KEY"]).toBe("line1\\nline2");
@@ -224,11 +218,8 @@ describe("resolveEnv", () => {
 
   it("preserves internal whitespace in double-quoted values", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(
-      join(dir, ".sandcastle", ".env"),
-      'KEY="  spaced  "\n',
-    );
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), 'KEY="  spaced  "\n');
 
     const env = await runResolveEnv(dir);
     expect(env["KEY"]).toBe("  spaced  ");
@@ -236,9 +227,9 @@ describe("resolveEnv", () => {
 
   it("unescapes \\r, \\t, and \\\\ in double-quoted values", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
+    await mkdir(join(dir, ".drover"));
     await writeFile(
-      join(dir, ".sandcastle", ".env"),
+      join(dir, ".drover", ".env"),
       'TAB="a\\tb"\nCR="a\\rb"\nBS="a\\\\b"\n',
     );
 
@@ -250,11 +241,8 @@ describe("resolveEnv", () => {
 
   it("handles escaped backslash before n in double-quoted values", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(
-      join(dir, ".sandcastle", ".env"),
-      'KEY="a\\\\nb"\n',
-    );
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), 'KEY="a\\\\nb"\n');
 
     const env = await runResolveEnv(dir);
     // \\n in the file → literal backslash + literal n (not a newline)
@@ -263,8 +251,8 @@ describe("resolveEnv", () => {
 
   it("parses unquoted values unchanged", async () => {
     const dir = await makeDir();
-    await mkdir(join(dir, ".sandcastle"));
-    await writeFile(join(dir, ".sandcastle", ".env"), "KEY=plain\n");
+    await mkdir(join(dir, ".drover"));
+    await writeFile(join(dir, ".drover", ".env"), "KEY=plain\n");
 
     const env = await runResolveEnv(dir);
     expect(env["KEY"]).toBe("plain");

@@ -2,7 +2,7 @@
  * Podman sandbox provider — creates Podman containers with bind-mounts.
  *
  * Usage:
- *   import { podman } from "sandcastle/sandboxes/podman";
+ *   import { podman } from "drover/sandboxes/podman";
  *   await run({ agent: claudeCode("claude-opus-4-8"), sandbox: podman() });
  */
 
@@ -167,7 +167,7 @@ export const podman = (options?: PodmanOptions): SandboxProvider => {
     create: async (
       createOptions: BindMountCreateOptions,
     ): Promise<BindMountSandboxHandle> => {
-      const containerName = `sandcastle-${randomUUID()}`;
+      const containerName = `drover-${randomUUID()}`;
 
       const worktreePath =
         createOptions.mounts.find(

@@ -1,4 +1,4 @@
-# Sandcastle
+# Drover
 
 A TypeScript toolkit that orchestrates AI coding agents inside isolated sandbox environments, managing the lifecycle of sandboxes, branches, prompts, and iterations.
 
@@ -6,7 +6,7 @@ A TypeScript toolkit that orchestrates AI coding agents inside isolated sandbox 
 
 ### Core concepts
 
-**Sandcastle**:
+**Drover**:
 The TypeScript CLI tool that orchestrates an **agent** inside a **sandbox**.
 _Avoid_: "the tool", "the CLI", "RALPH"
 
@@ -15,7 +15,7 @@ The isolation boundary around the **agent** -- a container, VM, or similar envir
 _Avoid_: "container" (too specific), "Docker sandbox" (ambiguous with Claude's built-in feature), "workspace"
 
 **Host**:
-The developer's machine where Sandcastle runs and the real git repo lives.
+The developer's machine where Drover runs and the real git repo lives.
 _Avoid_: "local" (ambiguous -- the sandbox also has a local filesystem)
 
 **Agent**:
@@ -51,7 +51,7 @@ A **branch strategy** where the **agent** works directly in the **host** working
 _Avoid_: `"none"` (old name), "direct"
 
 **Merge-to-head (branch strategy)**:
-A **branch strategy** where Sandcastle creates a temporary branch, the agent works on it, and changes are merged back to HEAD.
+A **branch strategy** where Drover creates a temporary branch, the agent works on it, and changes are merged back to HEAD.
 _Avoid_: `"temp-branch"` (old name), "auto-branch"
 
 **Branch (branch strategy)**:
@@ -59,7 +59,7 @@ A **branch strategy** where commits land on an explicitly named branch provided 
 _Avoid_: "named-branch"
 
 **Worktree**:
-A git worktree created in `.sandcastle/worktrees/` on the **host**, used by the **merge-to-head** and **branch** strategies. For **bind-mount sandbox providers**, the **worktree** is mounted into the **sandbox**. For **isolated sandbox providers**, the **worktree** is the sync source/destination -- commits from the **sandbox** are pulled back into the **worktree**. Created explicitly via `createWorktree()` or implicitly by `run()`/`interactive()` when using a non-**head** **branch strategy**.
+A git worktree created in `.drover/worktrees/` on the **host**, used by the **merge-to-head** and **branch** strategies. For **bind-mount sandbox providers**, the **worktree** is mounted into the **sandbox**. For **isolated sandbox providers**, the **worktree** is the sync source/destination -- commits from the **sandbox** are pulled back into the **worktree**. Created explicitly via `createWorktree()` or implicitly by `run()`/`interactive()` when using a non-**head** **branch strategy**.
 _Avoid_: "workspace", "branch copy", "clone"
 
 **Source branch**:
@@ -67,7 +67,7 @@ The branch the **agent** works on -- determined by the **branch strategy**.
 _Avoid_: "working branch", "agent branch"
 
 **Target branch**:
-The **host**'s active branch at `run()` time -- the branch Sandcastle merges into when using **merge-to-head**.
+The **host**'s active branch at `run()` time -- the branch Drover merges into when using **merge-to-head**.
 _Avoid_: "base branch", "destination branch", "merge target"
 
 ### Agents
@@ -103,7 +103,7 @@ A silence-based grace window that takes over from the **idle timeout** once a **
 _Avoid_: "grace period" (too generic), "post-completion timeout", "completion grace window", "drain timeout"
 
 **Structured output**:
-A schema-validated JSON payload emitted by the **agent** inside a caller-specified XML tag and returned to the caller of `run()`. Configured via `output: Output.object({ tag, schema })`. Orthogonal to the **completion signal** -- a run can use either, both, or neither. The caller owns the prompt-side instruction telling the agent to emit the tag; Sandcastle does not inject it, and `run()` errors early if the resolved prompt does not contain the configured tag.
+A schema-validated JSON payload emitted by the **agent** inside a caller-specified XML tag and returned to the caller of `run()`. Configured via `output: Output.object({ tag, schema })`. Orthogonal to the **completion signal** -- a run can use either, both, or neither. The caller owns the prompt-side instruction telling the agent to emit the tag; Drover does not inject it, and `run()` errors early if the resolved prompt does not contain the configured tag.
 _Avoid_: "output payload", "result", "JSON output"
 
 **Output schema**:
@@ -141,7 +141,7 @@ A `` !`command` `` marker in a **prompt** that evaluates a shell command inside 
 _Avoid_: "command" (overloaded), "inline command", "prompt command"
 
 **Built-in prompt argument**:
-A **prompt argument** that Sandcastle injects automatically -- not provided by the user via `promptArgs`.
+A **prompt argument** that Drover injects automatically -- not provided by the user via `promptArgs`.
 _Avoid_: "system variable", "auto argument", "default prompt argument"
 
 ### Hooks
@@ -161,8 +161,8 @@ The CLI command that scaffolds the **config directory** in a **host** repo.
 _Avoid_: "create", "bootstrap", "new"
 
 **Config directory**:
-The `.sandcastle/` directory in a **host** repo containing sandbox configuration.
-_Avoid_: ".sandcastle folder", "sandcastle dir"
+The `.drover/` directory in a **host** repo containing sandbox configuration.
+_Avoid_: ".drover folder", "drover dir"
 
 **Issue tracker**:
 A pluggable source of **tasks** for the **agent**, selected during **init** (e.g. GitHub Issues, Beads). Used loosely -- Beads is a dependency-aware task tracker rather than a literal issue tracker, but "issue tracker" is the umbrella term.
@@ -179,11 +179,11 @@ _Avoid_: "template expansion", "interpolation"
 ### Infrastructure
 
 **Build-image**:
-A provider-namespaced CLI command that rebuilds the image (e.g. `sandcastle docker build-image`).
+A provider-namespaced CLI command that rebuilds the image (e.g. `drover docker build-image`).
 _Avoid_: "setup-sandbox" (old name)
 
 **Remove-image**:
-A provider-namespaced CLI command that removes the image (e.g. `sandcastle docker remove-image`).
+A provider-namespaced CLI command that removes the image (e.g. `drover docker remove-image`).
 _Avoid_: "cleanup-sandbox" (old name)
 
 **Agent session**:
@@ -201,15 +201,15 @@ _Avoid_: "branch" (overloaded with git branches), "copy session"
 ### Display
 
 **Log-to-file mode**:
-The display mode where Sandcastle writes iteration progress and agent output to a **run log**.
+The display mode where Drover writes iteration progress and agent output to a **run log**.
 _Avoid_: "file mode", "file logging", "quiet mode"
 
 **Run log**:
-A log file written to `.sandcastle/logs/` during a run session.
+A log file written to `.drover/logs/` during a run session.
 _Avoid_: "log file" (too generic), "output file"
 
 **Terminal mode**:
-The display mode where Sandcastle renders an interactive UI in the terminal with spinners and styled status messages.
+The display mode where Drover renders an interactive UI in the terminal with spinners and styled status messages.
 _Avoid_: "stdout mode", "interactive mode", "CLI mode" (ambiguous with the CLI itself)
 
 **Agent stream event**:

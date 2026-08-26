@@ -21,11 +21,11 @@ describe("assertResumeSessionExists", () => {
   describe("no-sandbox (Claude Code)", () => {
     it("passes when the session lives under a cwd-encoded dir that does not match the host repo dir", async () => {
       // Simulate the agent having written the session in place from a worktree:
-      // the encoded directory reflects a realpath'd `.sandcastle/worktrees/...`
+      // the encoded directory reflects a realpath'd `.drover/worktrees/...`
       // path, which the host-repo-dir encoding would never reconstruct.
       const misEncodedDir = join(
         projectsDir,
-        "-private-tmp-myrepo--sandcastle-worktrees-feature",
+        "-private-tmp-myrepo--drover-worktrees-feature",
       );
       await mkdir(misEncodedDir, { recursive: true });
       await writeFile(join(misEncodedDir, `${SESSION_ID}.jsonl`), "{}");

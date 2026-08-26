@@ -68,11 +68,11 @@ export interface CreateSandboxOptions {
    * already exists. Defaults to `HEAD`.
    */
   readonly baseBranch?: string;
-  /** Sandbox provider (e.g. docker({ imageName: "sandcastle:myrepo" })). */
+  /** Sandbox provider (e.g. docker({ imageName: "drover:myrepo" })). */
   readonly sandbox: SandboxProvider;
   /**
    * Host repo directory. Replaces `process.cwd()` as the anchor for
-   * `.sandcastle/worktrees/`, `.sandcastle/.env`, and git operations.
+   * `.drover/worktrees/`, `.drover/.env`, and git operations.
    *
    * - Relative paths are resolved against `process.cwd()`.
    * - Absolute paths are used as-is.
@@ -405,7 +405,7 @@ const buildSandboxHandle = (
         type: "file",
         path: join(
           hostRepoDir,
-          ".sandcastle",
+          ".drover",
           "logs",
           buildLogFilename(branch, undefined, runOptions.name),
         ),
@@ -459,7 +459,7 @@ const buildSandboxHandle = (
         result = await Effect.runPromise(
           Effect.gen(function* () {
             const display = yield* Display;
-            yield* display.intro(runOptions.name ?? "sandcastle");
+            yield* display.intro(runOptions.name ?? "drover");
 
             const orchestrateResult = yield* orchestrate({
               hostRepoDir,

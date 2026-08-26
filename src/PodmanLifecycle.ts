@@ -26,11 +26,11 @@ const podmanExec = (args: string[]): Effect.Effect<string, PodmanError> =>
   });
 
 /**
- * Build the sandcastle Podman image.
+ * Build the drover Podman image.
  *
  * When `containerfile` is provided, uses `podman build -f <containerfile> <cwd>`
  * so COPY instructions resolve relative to the current working directory.
- * Otherwise, uses `podman build <containerfileDir>` (the default .sandcastle/ directory).
+ * Otherwise, uses `podman build <containerfileDir>` (the default .drover/ directory).
  */
 export const buildImage = (
   imageName: string,

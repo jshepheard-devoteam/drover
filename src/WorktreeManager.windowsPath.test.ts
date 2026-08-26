@@ -11,15 +11,15 @@ import {
 // a real Windows host would — something Linux/macOS CI cannot otherwise
 // reproduce, since both git and `join` emit forward slashes there.
 
-const worktreesDir = "C:\\repo\\.sandcastle\\worktrees";
-const gitWorktreePath = "C:/repo/.sandcastle/worktrees/feature-x";
-const joinWorktreePath = "C:\\repo\\.sandcastle\\worktrees\\feature-x";
+const worktreesDir = "C:\\repo\\.drover\\worktrees";
+const gitWorktreePath = "C:/repo/.drover/worktrees/feature-x";
+const joinWorktreePath = "C:\\repo\\.drover\\worktrees\\feature-x";
 
 describe("findCollidingWorktree", () => {
   it("matches by branch name", () => {
     const existing = [
       { path: gitWorktreePath, branch: "feature-x" },
-      { path: "C:/repo/.sandcastle/worktrees/other", branch: "other" },
+      { path: "C:/repo/.drover/worktrees/other", branch: "other" },
     ];
     const collision = findCollidingWorktree(
       existing,
@@ -44,7 +44,7 @@ describe("findCollidingWorktree", () => {
 
   it("returns undefined when nothing collides", () => {
     const existing = [
-      { path: "C:/repo/.sandcastle/worktrees/other", branch: "other" },
+      { path: "C:/repo/.drover/worktrees/other", branch: "other" },
     ];
     expect(
       findCollidingWorktree(existing, "feature-x", joinWorktreePath),

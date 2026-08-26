@@ -52,11 +52,11 @@ const initRepoWithCommit = async (dir: string) => {
   await commitFile(dir, "initial.txt", "initial", "initial commit");
 };
 
-/** Find the sole worktree directory created under hostDir/.sandcastle/worktrees. */
+/** Find the sole worktree directory created under hostDir/.drover/worktrees. */
 const findCreatedWorktree = async (
   hostDir: string,
 ): Promise<string | undefined> => {
-  const worktreesDir = join(hostDir, ".sandcastle", "worktrees");
+  const worktreesDir = join(hostDir, ".drover", "worktrees");
   if (!existsSync(worktreesDir)) return undefined;
   const entries = await readdir(worktreesDir);
   if (entries.length === 0) return undefined;
@@ -115,7 +115,7 @@ describe("WorktreeDockerSandboxFactory", () => {
     );
 
   beforeEach(async () => {
-    hostRepoDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    hostRepoDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostRepoDir);
     await initRepoWithCommit(hostRepoDir);
     mockProvider = makeMockProvider();
@@ -149,7 +149,7 @@ describe("WorktreeDockerSandboxFactory", () => {
     expect(observedBranch).toBe("feature/my-branch");
   });
 
-  it("creates a worktree on a generated sandcastle/<timestamp> branch when no branch is specified", async () => {
+  it("creates a worktree on a generated drover/<timestamp> branch when no branch is specified", async () => {
     let observedBranch: string | undefined;
     await Effect.runPromise(
       Effect.gen(function* () {
@@ -162,7 +162,7 @@ describe("WorktreeDockerSandboxFactory", () => {
       }).pipe(Effect.provide(makeLayer())),
     );
 
-    expect(observedBranch).toMatch(/^sandcastle\//);
+    expect(observedBranch).toMatch(/^drover\//);
   });
 
   it("creates the worktree before calling provider.create", async () => {
@@ -462,7 +462,7 @@ describe("WorktreeDockerSandboxFactory", () => {
     const failingProvider = createBindMountSandboxProvider({
       name: "failing-provider",
       create: async () => {
-        throw new Error("Image 'sandcastle:test' not found locally");
+        throw new Error("Image 'drover:test' not found locally");
       },
     });
 
@@ -643,7 +643,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("copies copyToWorktree files into the isolated sandbox via copyIn", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
     await commitFile(hostDir, "extra.txt", "extra content", "add extra");
@@ -665,7 +665,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("copies nested copyToWorktree paths, creating parent directories", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
     await mkdir(join(hostDir, "subdir"), { recursive: true });
@@ -696,7 +696,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("works without copyToWorktree (no regression)", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
     await commitFile(hostDir, "hello.txt", "hello world", "add hello");
@@ -718,7 +718,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("copies copyToWorktree directories into the isolated sandbox via copyIn", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
     await mkdir(join(hostDir, "config", "nested"), { recursive: true });
@@ -749,7 +749,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("skips missing copyToWorktree paths without error", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -767,7 +767,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("creates a worktree before starting the isolated sandbox", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -778,12 +778,12 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
       }).pipe(Effect.provide(makeIsolatedLayer(hostDir))),
     );
 
-    // After cleanup the worktree dir is gone, but the .sandcastle/worktrees dir exists
-    expect(existsSync(join(hostDir, ".sandcastle", "worktrees"))).toBe(true);
+    // After cleanup the worktree dir is gone, but the .drover/worktrees dir exists
+    expect(existsSync(join(hostDir, ".drover", "worktrees"))).toBe(true);
   });
 
   it("creates a worktree with a named branch for branch strategy", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -817,7 +817,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("provides hostWorktreePath in SandboxInfo", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -834,12 +834,12 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
 
     expect(receivedInfo?.hostWorktreePath).toBeDefined();
     expect(receivedInfo!.hostWorktreePath).toContain(
-      join(hostDir, ".sandcastle", "worktrees"),
+      join(hostDir, ".drover", "worktrees"),
     );
   });
 
   it("removes worktree on success with clean worktree", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -859,7 +859,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("preserves worktree on failure with dirty worktree", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -885,7 +885,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("removes worktree when isolated sandbox start fails", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -925,7 +925,7 @@ describe("WorktreeDockerSandboxFactory — isolated providers", () => {
   });
 
   it("provides applyToHost callback that syncs commits to worktree", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -992,7 +992,7 @@ describe("WorktreeDockerSandboxFactory — no-sandbox provider", () => {
   });
 
   it("head mode: does not create a worktree and runs in hostRepoDir", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
     await commitFile(hostDir, "hello.txt", "hi", "add hello");
@@ -1019,7 +1019,7 @@ describe("WorktreeDockerSandboxFactory — no-sandbox provider", () => {
   });
 
   it("worktree mode: creates worktree, runs in it, cleans up on success", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 
@@ -1039,13 +1039,13 @@ describe("WorktreeDockerSandboxFactory — no-sandbox provider", () => {
 
     expect(observedWorktreePath).toBeDefined();
     expect(observedWorktreePath).toContain(
-      join(hostDir, ".sandcastle", "worktrees"),
+      join(hostDir, ".drover", "worktrees"),
     );
     expect(existsSync(observedWorktreePath!)).toBe(false);
   });
 
   it("worktree mode: removes worktree when sandbox start fails", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-test-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-test-"));
     tempDirs.push(hostDir);
     await initRepoWithCommit(hostDir);
 

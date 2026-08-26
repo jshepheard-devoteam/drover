@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFileSync, execSync } from "node:child_process";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import * as sandcastle from "@ai-hero/sandcastle";
+import * as drover from "@devoteam/drover";
 
 export const outputDir = (): string => process.env.OUTPUT_DIR ?? "/tmp";
 
@@ -53,7 +53,7 @@ export const writeText = (filename: string, value: string): void => {
 };
 
 export const claudeAgent = () =>
-  sandcastle.claudeCode("claude-opus-4-8", {
+  drover.claudeCode("claude-opus-4-8", {
     env: {
       CLAUDE_CODE_OAUTH_TOKEN: required("CLAUDE_CODE_OAUTH_TOKEN"),
     },
@@ -64,7 +64,7 @@ export const standardSchema = <T>(
 ): StandardSchemaV1<unknown, T> => ({
   "~standard": {
     version: 1,
-    vendor: "sandcastle-agent-workflows",
+    vendor: "drover-agent-workflows",
     validate: (value: unknown) => {
       try {
         return { value: validate(value) };

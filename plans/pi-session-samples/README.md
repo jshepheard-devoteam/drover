@@ -19,7 +19,7 @@ Shows the event stream a single iteration emits — what `parsePiStreamLine` par
 ### `resumed-session.jsonl`
 
 On-disk session file after a **two-turn resume** (mutate-in-place), copied verbatim from
-`~/.pi/agent/sessions/--home-mattpocock-repos-ai-sandcastle--/<ISO>_<uuid>.jsonl`.
+`~/.pi/agent/sessions/--home-mattpocock-repos-ai-drover--/<ISO>_<uuid>.jsonl`.
 
 Demonstrates the persisted JSONL shape:
 

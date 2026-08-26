@@ -26,7 +26,7 @@ export const testIsolated = (): IsolatedSandboxProvider =>
   createIsolatedSandboxProvider({
     name: "test-isolated",
     create: async (): Promise<IsolatedSandboxHandle> => {
-      const temp = await createTempSandbox("sandcastle-test-");
+      const temp = await createTempSandbox("drover-test-");
 
       return {
         worktreePath: temp.worktreePath,

@@ -1,5 +1,5 @@
-import * as sandcastle from "@ai-hero/sandcastle";
-import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
+import * as drover from "@devoteam/drover";
+import { docker } from "@devoteam/drover/sandboxes/docker";
 
 const MAX_ITERATIONS = 10;
 const MAX_PARALLEL = 4;
@@ -8,11 +8,11 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   console.log(`\n=== Iteration ${iteration}/${MAX_ITERATIONS} ===\n`);
 
   // Phase 1: Plan — orchestrator agent analyzes issues and picks parallelizable work
-  const plan = await sandcastle.run({
+  const plan = await drover.run({
     sandbox: docker(),
     name: "Planner",
-    agent: sandcastle.claudeCode("claude-opus-4-8"),
-    promptFile: "./.sandcastle/plan-prompt.md",
+    agent: drover.claudeCode("claude-opus-4-8"),
+    promptFile: "./.drover/plan-prompt.md",
   });
 
   const planMatch = plan.stdout.match(/<plan>([\s\S]*?)<\/plan>/);
@@ -58,7 +58,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     issues.map(async (issue) => {
       await acquire();
       try {
-        await using sandbox = await sandcastle.createSandbox({
+        await using sandbox = await drover.createSandbox({
           sandbox: docker(),
           branch: issue.branch,
           copyToWorktree: ["node_modules"],
@@ -71,8 +71,8 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
 
         const result = await sandbox.run({
           name: "Implementer #" + issue.number,
-          agent: sandcastle.claudeCode("claude-opus-4-8"),
-          promptFile: "./.sandcastle/implement-prompt.md",
+          agent: drover.claudeCode("claude-opus-4-8"),
+          promptFile: "./.drover/implement-prompt.md",
           promptArgs: {
             TASK_ID: String(issue.number),
             ISSUE_TITLE: issue.title,
@@ -83,8 +83,8 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
         if (result.commits.length > 0) {
           await sandbox.run({
             name: "Reviewer #" + issue.number,
-            agent: sandcastle.claudeCode("claude-opus-4-8"),
-            promptFile: "./.sandcastle/review-prompt.md",
+            agent: drover.claudeCode("claude-opus-4-8"),
+            promptFile: "./.drover/review-prompt.md",
             promptArgs: {
               TASK_ID: String(issue.number),
               ISSUE_TITLE: issue.title,
@@ -114,9 +114,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
       (
         entry,
       ): entry is {
-        outcome: PromiseFulfilledResult<
-          Awaited<ReturnType<typeof sandcastle.run>>
-        >;
+        outcome: PromiseFulfilledResult<Awaited<ReturnType<typeof drover.run>>>;
         issue: (typeof issues)[number];
       } =>
         entry.outcome.status === "fulfilled" &&
@@ -139,12 +137,12 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   }
 
   // Phase 3: Merge — one agent merges all branches together
-  await sandcastle.run({
+  await drover.run({
     sandbox: docker(),
     name: "Merger",
     maxIterations: 10,
-    agent: sandcastle.claudeCode("claude-opus-4-8"),
-    promptFile: "./.sandcastle/merge-prompt.md",
+    agent: drover.claudeCode("claude-opus-4-8"),
+    promptFile: "./.drover/merge-prompt.md",
     promptArgs: {
       BRANCHES: completedBranches.map((b) => `- ${b}`).join("\n"),
       ISSUES: completedIssues

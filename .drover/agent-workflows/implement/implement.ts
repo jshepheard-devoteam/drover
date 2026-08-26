@@ -1,6 +1,6 @@
 import * as path from "node:path";
-import * as sandcastle from "@ai-hero/sandcastle";
-import { noSandbox } from "@ai-hero/sandcastle/sandboxes/no-sandbox";
+import * as drover from "@devoteam/drover";
+import { noSandbox } from "@devoteam/drover/sandboxes/no-sandbox";
 import { claudeAgent, fail, required, safeSh, sh } from "../shared/common";
 
 const ISSUE_NUMBER = required("ISSUE_NUMBER");
@@ -12,7 +12,7 @@ try {
     safeSh(`gh issue view ${ISSUE_NUMBER} --comments`) ||
     `Issue #${ISSUE_NUMBER}: ${ISSUE_TITLE}`;
 
-  const result = await sandcastle.run({
+  const result = await drover.run({
     name: `implement-#${ISSUE_NUMBER}`,
     agent: claudeAgent(),
     sandbox: noSandbox(),

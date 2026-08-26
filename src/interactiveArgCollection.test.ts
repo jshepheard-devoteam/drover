@@ -27,7 +27,7 @@ describe("interactive arg collection", () => {
 
   beforeEach(() => {
     originalCwd = process.cwd();
-    hostDir = mkdtempSync(join(tmpdir(), "sandcastle-interactive-argcol-"));
+    hostDir = mkdtempSync(join(tmpdir(), "drover-interactive-argcol-"));
     execSync("git init", { cwd: hostDir, stdio: "ignore" });
     execSync('git config user.email "test@test.com"', {
       cwd: hostDir,

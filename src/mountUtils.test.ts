@@ -30,31 +30,31 @@ vi.mock("node:os", async (importOriginal) => {
 
 describe("defaultImageName", () => {
   it("derives image name from POSIX repo directory", () => {
-    expect(defaultImageName("/home/user/my-repo")).toBe("sandcastle:my-repo");
+    expect(defaultImageName("/home/user/my-repo")).toBe("drover:my-repo");
   });
 
   it("lowercases and sanitizes the directory name", () => {
-    expect(defaultImageName("/home/user/My Repo!")).toBe("sandcastle:my-repo-");
+    expect(defaultImageName("/home/user/My Repo!")).toBe("drover:my-repo-");
   });
 
   it("handles trailing slashes", () => {
-    expect(defaultImageName("/home/user/repo/")).toBe("sandcastle:repo");
+    expect(defaultImageName("/home/user/repo/")).toBe("drover:repo");
   });
 
   it("falls back to 'local' for empty path", () => {
-    expect(defaultImageName("")).toBe("sandcastle:local");
+    expect(defaultImageName("")).toBe("drover:local");
   });
 
   it("handles Windows paths with backslashes", () => {
-    expect(defaultImageName("C:\\Users\\project")).toBe("sandcastle:project");
+    expect(defaultImageName("C:\\Users\\project")).toBe("drover:project");
   });
 
   it("handles Windows paths with trailing backslash", () => {
-    expect(defaultImageName("C:\\Users\\project\\")).toBe("sandcastle:project");
+    expect(defaultImageName("C:\\Users\\project\\")).toBe("drover:project");
   });
 
   it("handles mixed separators", () => {
-    expect(defaultImageName("C:\\Users/project")).toBe("sandcastle:project");
+    expect(defaultImageName("C:\\Users/project")).toBe("drover:project");
   });
 });
 
@@ -410,8 +410,8 @@ describe("patchGitMountsForWindows", () => {
       expect(result).toEqual(mounts);
     });
 
-    it("remaps parent .git dir and adds overlay mount for Sandcastle-created worktree", async () => {
-      // Scenario B: Sandcastle created a worktree. resolveGitMounts returned
+    it("remaps parent .git dir and adds overlay mount for Drover-created worktree", async () => {
+      // Scenario B: Drover created a worktree. resolveGitMounts returned
       // one mount for the parent .git directory. The worktree's .git file
       // points into it.
       const mounts = [

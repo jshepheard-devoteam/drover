@@ -41,7 +41,7 @@ export const resolvePrompt = (
     return Effect.fail(
       new PromptError({
         message:
-          "Must provide either prompt or promptFile. Pass prompt: '...' or promptFile: './.sandcastle/prompt.md' to run().",
+          "Must provide either prompt or promptFile. Pass prompt: '...' or promptFile: './.drover/prompt.md' to run().",
       }),
     );
   }

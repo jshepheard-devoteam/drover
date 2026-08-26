@@ -86,11 +86,11 @@ describe("noSandbox", () => {
       const provider = noSandbox();
       const handle = await provider.create({
         worktreePath: process.cwd(),
-        env: { MY_TEST_VAR: "sandcastle_test_value" },
+        env: { MY_TEST_VAR: "drover_test_value" },
       });
 
       const result = await handle.exec("echo $MY_TEST_VAR");
-      expect(result.stdout.trim()).toBe("sandcastle_test_value");
+      expect(result.stdout.trim()).toBe("drover_test_value");
     });
 
     itWindows(
@@ -103,11 +103,11 @@ describe("noSandbox", () => {
         const provider = noSandbox();
         const handle = await provider.create({
           worktreePath: process.cwd(),
-          env: { MY_TEST_VAR: "sandcastle_test_value" },
+          env: { MY_TEST_VAR: "drover_test_value" },
         });
 
         const result = await handle.exec("echo %MY_TEST_VAR%");
-        expect(result.stdout.trim()).toBe("sandcastle_test_value");
+        expect(result.stdout.trim()).toBe("drover_test_value");
       },
     );
 

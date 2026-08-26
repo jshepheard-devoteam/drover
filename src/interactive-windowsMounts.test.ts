@@ -109,7 +109,7 @@ describe("interactive() Windows mount patching", () => {
     const worktreePath = call[1];
     const sandboxRepoDir = call[2];
     expect(Array.isArray(gitMounts)).toBe(true);
-    expect(worktreePath).toContain(".sandcastle/worktrees");
+    expect(worktreePath).toContain(".drover/worktrees");
     expect(sandboxRepoDir).toBe(SANDBOX_REPO_DIR);
   });
 

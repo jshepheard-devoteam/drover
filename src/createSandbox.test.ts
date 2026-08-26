@@ -262,7 +262,7 @@ describe("createSandbox", () => {
 
     try {
       expect(sandbox.branch).toBe("test-branch");
-      expect(sandbox.worktreePath).toContain(".sandcastle/worktrees");
+      expect(sandbox.worktreePath).toContain(".drover/worktrees");
       expect(existsSync(sandbox.worktreePath)).toBe(true);
     } finally {
       await sandbox.close();
@@ -918,7 +918,7 @@ describe("createSandbox", () => {
       create: async (opts) => ({
         worktreePath: opts.worktreePath,
         exec: async (cmd, execOpts) => {
-          // Sandcastle issues a `git config --global --add safe.directory ...`
+          // Drover issues a `git config --global --add safe.directory ...`
           // command before user code can run; only record the user-issued one.
           if (cmd === "echo hello-from-provider") {
             userExecCmd = cmd;
@@ -1505,7 +1505,7 @@ describe("createSandbox", () => {
 
     try {
       expect(sandbox.branch).toBe("test-isolated-branch");
-      expect(sandbox.worktreePath).toContain(".sandcastle/worktrees");
+      expect(sandbox.worktreePath).toContain(".drover/worktrees");
       expect(existsSync(sandbox.worktreePath)).toBe(true);
     } finally {
       await sandbox.close();
@@ -2158,7 +2158,7 @@ describe("createSandbox", () => {
     const failingProvider = createBindMountSandboxProvider({
       name: "failing-create",
       create: async () => {
-        throw new Error("Image 'sandcastle:test' not found locally");
+        throw new Error("Image 'drover:test' not found locally");
       },
     });
 
@@ -2172,14 +2172,14 @@ describe("createSandbox", () => {
       ).rejects.toThrow();
 
       // The worktree must not be left orphaned on disk.
-      const worktreesDir = join(hostDir, ".sandcastle", "worktrees");
+      const worktreesDir = join(hostDir, ".drover", "worktrees");
       const leftover = existsSync(worktreesDir)
         ? readdirSync(worktreesDir)
         : [];
       expect(leftover).toHaveLength(0);
 
       const { stdout } = await execAsync("git worktree list", { cwd: hostDir });
-      expect(stdout).not.toContain(".sandcastle/worktrees");
+      expect(stdout).not.toContain(".drover/worktrees");
     } finally {
       await rm(hostDir, { recursive: true, force: true });
     }

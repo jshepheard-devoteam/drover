@@ -26,7 +26,7 @@ export const testBindMount = (): BindMountSandboxProvider =>
   createBindMountSandboxProvider({
     name: "test-bind-mount",
     create: async (): Promise<BindMountSandboxHandle> => {
-      const temp = await createTempSandbox("sandcastle-test-bm-");
+      const temp = await createTempSandbox("drover-test-bm-");
 
       return {
         worktreePath: temp.worktreePath,

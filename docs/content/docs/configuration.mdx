@@ -1,11 +1,11 @@
 ---
 title: Configuration
-description: Configure Sandcastle for your project.
+description: Configure Drover for your project.
 ---
 
 ## Config Directory
 
-The `.sandcastle/` directory in your repository contains all Sandcastle configuration:
+The `.drover/` directory in your repository contains all Drover configuration:
 
 - `config.json` -- Main configuration file
 - `Dockerfile` -- Defines the sandbox environment
@@ -14,7 +14,7 @@ The `.sandcastle/` directory in your repository contains all Sandcastle configur
 
 ## Config File
 
-The `config.json` file controls how Sandcastle operates:
+The `config.json` file controls how Drover operates:
 
 ```json
 {
@@ -39,7 +39,7 @@ The `prompt.md` file is the instruction text passed to the agent at the start of
 
 ## Environment Variables
 
-Sandcastle resolves environment variables from multiple sources in order:
+Drover resolves environment variables from multiple sources in order:
 
 1. Repository root `.env`
 2. Config directory `.env`

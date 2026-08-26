@@ -26,7 +26,7 @@ The `-o` (`--non-unique`) flag lets the alignment succeed when the host GID/UID 
 
 The `USER` directive is now numeric (`${AGENT_UID}:${AGENT_GID}`) instead of `USER agent`, so that `docker image inspect --format '{{.Config.User}}'` returns a parseable `UID:GID` for the pre-flight check.
 
-### Build-time: `sandcastle docker build-image` defaults build-args to host UID/GID
+### Build-time: `drover docker build-image` defaults build-args to host UID/GID
 
 `buildImage()` accepts a new `buildArgs: Record<string, string>` option. The CLI command defaults `AGENT_UID` to `process.getuid()` and `AGENT_GID` to `process.getgid()` on Linux/macOS. On Windows (where `getuid()` is unavailable), the ARGs keep their Dockerfile default of 1000.
 
@@ -38,7 +38,7 @@ Mirrors the Podman provider's existing surface. Defaults to the host UID/GID (`p
 
 Before `docker run`, the Docker provider calls `docker image inspect <img> --format '{{.Config.User}}'` and parses the numeric UID. If it doesn't match the effective UID (host UID or explicit `containerUid`), the provider throws a clear error naming both remedies:
 
-1. Rebuild with `sandcastle docker build-image`
+1. Rebuild with `drover docker build-image`
 2. Pass `containerUid: <image-uid>` to `docker()` to match the image
 
 Non-numeric users (e.g. legacy images using `USER agent`) and images with no `USER` directive skip the check.

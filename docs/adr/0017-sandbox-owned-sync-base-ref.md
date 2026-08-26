@@ -19,9 +19,9 @@ sandbox is torn down (issue #651).
 ## Decision
 
 `syncOut` tracks the last-synced sandbox commit in a sandbox-owned ref,
-`refs/sandcastle/sync-base`, kept entirely inside the sandbox's own git repo:
+`refs/drover/sync-base`, kept entirely inside the sandbox's own git repo:
 
-- **Resolve the base:** `git rev-parse --verify refs/sandcastle/sync-base` in
+- **Resolve the base:** `git rev-parse --verify refs/drover/sync-base` in
   the sandbox; if the ref is absent, fall back to the host's HEAD.
 - **Advance the ref** to the sandbox's HEAD after the commit-application step
   succeeds — independent of whether the later uncommitted-diff or untracked-file
@@ -33,7 +33,7 @@ only thing that rewrites host HEAD. So whenever the ref is missing, host HEAD
 has not been rewritten and is therefore a valid base that still exists in the
 sandbox. The two conditions are coupled, which is what makes the fallback safe.
 
-The custom `refs/sandcastle/` namespace keeps the marker invisible to `git
+The custom `refs/drover/` namespace keeps the marker invisible to `git
 log`, `git branch`, and `git tag`, and it never reaches the host: the
 sandbox→host channel (`format-patch`/`am`) carries commits, not refs.
 

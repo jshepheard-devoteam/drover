@@ -12,7 +12,7 @@
       "Bash(npm test:*)",
       "Bash(npm check:*)",
       "Bash(npm run typecheck *)",
-      "Bash(git merge sandcastle/*)"
+      "Bash(git merge drover/*)"
     ]
   }
 }

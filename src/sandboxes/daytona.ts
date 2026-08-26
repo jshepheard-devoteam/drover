@@ -72,7 +72,7 @@ export interface DaytonaOptions {
  *
  * @example
  * ```ts
- * import { daytona } from "@ai-hero/sandcastle/sandboxes/daytona";
+ * import { daytona } from "@devoteam/drover/sandboxes/daytona";
  *
  * const provider = daytona({ apiKey: "dyt_my_key" });
  * ```
@@ -113,7 +113,7 @@ export const daytona = (options?: DaytonaOptions): IsolatedSandboxProvider =>
           const effectiveCommand = opts?.sudo ? `sudo ${command}` : command;
           if (opts?.onLine) {
             const onLine = opts.onLine;
-            const sessionId = `sandcastle-${crypto.randomUUID()}`;
+            const sessionId = `drover-${crypto.randomUUID()}`;
             await sandbox.process.createSession(sessionId);
 
             try {

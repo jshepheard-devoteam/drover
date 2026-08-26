@@ -1,10 +1,10 @@
-import * as sandcastle from "@ai-hero/sandcastle";
-import { podman } from "@ai-hero/sandcastle/sandboxes/podman";
+import * as drover from "@devoteam/drover";
+import { podman } from "@devoteam/drover/sandboxes/podman";
 
-const { commits, branch } = await sandcastle.run({
+const { commits, branch } = await drover.run({
   sandbox: podman(),
   name: "Test",
-  agent: sandcastle.claudeCode("claude-sonnet-4-6"),
+  agent: drover.claudeCode("claude-sonnet-4-6"),
   prompt: "Add /foobar to the .gitignore, then commit.",
   hooks: {
     sandbox: {

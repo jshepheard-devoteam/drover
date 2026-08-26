@@ -4,7 +4,7 @@ Research for [#250](https://github.com/mattpocock/sandcastle/issues/250) — plu
 
 **Date:** 2026-04-10
 
-Two provider types in Sandcastle's architecture (see [UBIQUITOUS_LANGUAGE.md](./UBIQUITOUS_LANGUAGE.md)):
+Two provider types in Drover's architecture (see [UBIQUITOUS_LANGUAGE.md](./UBIQUITOUS_LANGUAGE.md)):
 
 - **Bind-mount sandbox provider** — host creates a worktree, provider mounts it in. No sync needed. Docker/Podman are examples.
 - **Isolated sandbox provider** — own filesystem, syncs code via `copyIn`/`copyOut`/`extractCommits`. Git bundle/patch sync.
@@ -21,7 +21,7 @@ Two provider types in Sandcastle's architecture (see [UBIQUITOUS_LANGUAGE.md](./
    - [macOS-Specific](#macos-specific)
    - [Windows-Specific](#windows-specific)
 2. [Isolated Providers](#isolated-providers-cloud--remote)
-3. [Not Viable](#not-viable-for-sandcastle)
+3. [Not Viable](#not-viable-for-drover)
 4. [Summary Matrix](#summary-matrix)
 5. [Recommendations](#recommendations)
 
@@ -46,7 +46,7 @@ These are the primary candidates — they manage container lifecycles and suppor
 | **Platform**          | Linux, macOS, Windows                                             |
 | **API**               | CLI, REST API, Docker SDK (Go, Python, etc.)                      |
 
-The incumbent. Universal image ecosystem. Requires a daemon. Already supported by Sandcastle.
+The incumbent. Universal image ecosystem. Requires a daemon. Already supported by Drover.
 
 #### Podman
 
@@ -189,7 +189,7 @@ The Swiss army knife. `microvm` machine type strips to near-Firecracker simplici
 | **Platform**          | Linux only                                         |
 | **API**               | REST API over Unix socket                          |
 
-Powers AWS Lambda and Fargate. Fast boot (<125ms). But **no filesystem sharing** — only block devices. A Firecracker-based Sandcastle provider would have to be an **isolated provider** (git sync). A WIP virtiofs PR was never merged.
+Powers AWS Lambda and Fargate. Fast boot (<125ms). But **no filesystem sharing** — only block devices. A Firecracker-based Drover provider would have to be an **isolated provider** (git sync). A WIP virtiofs PR was never merged.
 
 ---
 
@@ -319,7 +319,7 @@ Popular Docker Desktop replacement. Provides a Docker socket — the Docker prov
 | **Platform**          | macOS only                                                 |
 | **API**               | Docker CLI compatible, `orb` CLI                           |
 
-Fastest Docker Desktop alternative on macOS. Provides a Docker socket — works transparently with Sandcastle's Docker provider.
+Fastest Docker Desktop alternative on macOS. Provides a Docker socket — works transparently with Drover's Docker provider.
 
 #### Tart
 
@@ -362,7 +362,7 @@ The standard way to run Docker/Podman on Windows. Keep project files in the Linu
 | **Platform**          | Windows only                                            |
 | **API**               | `.wsb` files, new CLI in 24H2 but **no stdout capture** |
 
-Disposable Windows desktop. The lack of process I/O capture makes it **unusable for Sandcastle's `exec` model**.
+Disposable Windows desktop. The lack of process I/O capture makes it **unusable for Drover's `exec` model**.
 
 #### Hyper-V Containers
 
@@ -514,7 +514,7 @@ Lower-level services that could host sandboxes but require more DIY.
 
 ---
 
-## Not Viable for Sandcastle
+## Not Viable for Drover
 
 | Tool                                                  | Reason                                                                                                         |
 | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -567,7 +567,7 @@ Lower-level services that could host sandboxes but require more DIY.
 
 ### Near-term (isolated providers, requires implementing git sync)
 
-3. **Daytona** — Best isolated provider candidate. 90ms startup, TS SDK, built-in Git support (simplifies sync), AGPL (self-hostable). The Git integration means Sandcastle's bundle/patch sync could potentially be replaced by Daytona's native Git ops.
+3. **Daytona** — Best isolated provider candidate. 90ms startup, TS SDK, built-in Git support (simplifies sync), AGPL (self-hostable). The Git integration means Drover's bundle/patch sync could potentially be replaced by Daytona's native Git ops.
 
 4. **E2B** — Most proven AI sandbox service. TS SDK. No built-in Git (would need full bundle/patch sync) but rock-solid API.
 

@@ -414,7 +414,7 @@ describe("docker()", () => {
         env: {},
       }),
     ).rejects.toThrow(
-      "Image 'my-app:latest' not found locally. Build it first with 'sandcastle docker build-image'.",
+      "Image 'my-app:latest' not found locally. Build it first with 'drover docker build-image'.",
     );
   });
 
@@ -507,7 +507,7 @@ describe("docker()", () => {
     const cpArgs = cpCall![1] as string[];
     expect(cpArgs[0]).toBe("cp");
     expect(cpArgs[1]).toBe("/host/file.txt");
-    expect(cpArgs[2]).toMatch(/^sandcastle-.*:\/sandbox\/file\.txt$/);
+    expect(cpArgs[2]).toMatch(/^drover-.*:\/sandbox\/file\.txt$/);
 
     await handle.close();
   });
@@ -542,7 +542,7 @@ describe("docker()", () => {
     expect(cpCall).toBeDefined();
     const cpArgs = cpCall![1] as string[];
     expect(cpArgs[0]).toBe("cp");
-    expect(cpArgs[1]).toMatch(/^sandcastle-.*:\/sandbox\/output\.txt$/);
+    expect(cpArgs[1]).toMatch(/^drover-.*:\/sandbox\/output\.txt$/);
     expect(cpArgs[2]).toBe("/host/output.txt");
 
     await handle.close();

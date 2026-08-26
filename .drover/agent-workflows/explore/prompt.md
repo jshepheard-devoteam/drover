@@ -14,7 +14,7 @@ Read the project's domain and architecture docs to ground your assessment:
 
 - `CONTEXT.md`
 - `docs/adr/` if relevant
-- `.sandcastle/CODING_STANDARDS.md`
+- `.drover/CODING_STANDARDS.md`
 
 # EXPLORATION
 

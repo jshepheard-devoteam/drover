@@ -65,7 +65,7 @@ Issues: **#327, #366, #385, #196**.
 - **Docker has no UID alignment**: passes raw `process.getuid()`, no chown, no userns flag, no build-arg, no entrypoint script. Pure regression after `a971e1e`.
 - **Docker has no SELinux labels** on volume mounts.
 - **Neither provider pre-creates the parent directory** of a single-file mount inside the image with correct ownership.
-- No `--build-arg AGENT_UID=$(id -u)` path in `sandcastle docker build-image` despite ADR-0005 explicitly listing it as the planned escape hatch.
+- No `--build-arg AGENT_UID=$(id -u)` path in `drover docker build-image` despite ADR-0005 explicitly listing it as the planned escape hatch.
 - The init Dockerfile templates (`InitService.ts`) don't `mkdir -p /home/agent/.codex` (or any per-agent config dir) before `USER agent`.
 
 ## 3. Root cause of #499
@@ -85,7 +85,7 @@ The mount-handling path: the Docker provider builds `${hostPath}:${sandboxPath}[
 Re-introduce host-UID alignment without a runtime chown by baking it into the image build:
 
 - In `InitService.ts` Dockerfile templates, add `ARG AGENT_UID=1000` / `ARG AGENT_GID=1000` and change to `RUN usermod -d /home/agent -m -l agent -u $AGENT_UID node && groupmod -g $AGENT_GID agent`.
-- `sandcastle docker build-image` (and `DockerLifecycle.buildImage`) gain a `buildArgs` option and pass `--build-arg AGENT_UID=$(process.getuid())` / `--build-arg AGENT_GID=$(process.getgid())` by default on Linux/macOS.
+- `drover docker build-image` (and `DockerLifecycle.buildImage`) gain a `buildArgs` option and pass `--build-arg AGENT_UID=$(process.getuid())` / `--build-arg AGENT_GID=$(process.getgid())` by default on Linux/macOS.
 - The Docker provider keeps `--user ${hostUid}:${hostGid}` — now matches the image. No chown, no namespace flag, no recursion.
 - Document that re-`build-image` is needed when host UID changes (rare).
 
@@ -109,7 +109,7 @@ Add `selinuxLabel?: "z" | "Z" | false` to `DockerOptions`, default `"z"` (shared
 
 ### Layer 4 — Pre-flight diagnostic for image vs host UID drift
 
-Before `docker run`, run `docker image inspect <img> --format '{{.Config.User}}'` and compare to host UID. If mismatched and the image was not built with `--build-arg AGENT_UID`, throw a clear error pointing to `sandcastle docker build-image`. Mirror the Podman pre-flight already in place.
+Before `docker run`, run `docker image inspect <img> --format '{{.Config.User}}'` and compare to host UID. If mismatched and the image was not built with `--build-arg AGENT_UID`, throw a clear error pointing to `drover docker build-image`. Mirror the Podman pre-flight already in place.
 
 ### Cross-platform matrix
 

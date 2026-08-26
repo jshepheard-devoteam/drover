@@ -14,7 +14,7 @@ Read the project's domain and architecture docs before changing code:
 
 - `CONTEXT.md`
 - `docs/adr/` if relevant
-- `.sandcastle/CODING_STANDARDS.md`
+- `.drover/CODING_STANDARDS.md`
 
 Explore the repo and relevant tests before editing.
 

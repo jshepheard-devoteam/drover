@@ -313,7 +313,7 @@ describe("syncOut", () => {
     }
   });
 
-  it("successful sync-out leaves no patch artifacts in .sandcastle/patches", async () => {
+  it("successful sync-out leaves no patch artifacts in .drover/patches", async () => {
     const hostDir = await mkdtemp(join(tmpdir(), "host-"));
     await initRepo(hostDir);
     await commitFile(hostDir, "initial.txt", "initial", "initial commit");
@@ -340,29 +340,29 @@ describe("syncOut", () => {
       expect(log[0]).toContain("add new file");
 
       // Verify no patch artifacts remain
-      const patchesDir = join(hostDir, ".sandcastle", "patches");
+      const patchesDir = join(hostDir, ".drover", "patches");
       expect(existsSync(patchesDir)).toBe(false);
     } finally {
       await handle.close();
     }
   });
 
-  it("successful sync-out preserves tracked .sandcastle files", async () => {
+  it("successful sync-out preserves tracked .drover files", async () => {
     const hostDir = await mkdtemp(join(tmpdir(), "host-"));
     await initRepo(hostDir);
     await commitFile(hostDir, "initial.txt", "initial", "initial commit");
 
-    // Commit tracked files inside .sandcastle, as a real repo would have
-    await mkdir(join(hostDir, ".sandcastle"), { recursive: true });
+    // Commit tracked files inside .drover, as a real repo would have
+    await mkdir(join(hostDir, ".drover"), { recursive: true });
     await commitFile(
       hostDir,
-      join(".sandcastle", "prompt.md"),
+      join(".drover", "prompt.md"),
       "prompt",
-      "add .sandcastle config",
+      "add .drover config",
     );
     await commitFile(
       hostDir,
-      join(".sandcastle", "Dockerfile"),
+      join(".drover", "Dockerfile"),
       "FROM node",
       "add Dockerfile",
     );
@@ -379,11 +379,11 @@ describe("syncOut", () => {
 
       await Effect.runPromise(syncOut(hostDir, handle));
 
-      // The whole .sandcastle dir must not be deleted by cleanup
-      expect(existsSync(join(hostDir, ".sandcastle", "prompt.md"))).toBe(true);
-      expect(existsSync(join(hostDir, ".sandcastle", "Dockerfile"))).toBe(true);
+      // The whole .drover dir must not be deleted by cleanup
+      expect(existsSync(join(hostDir, ".drover", "prompt.md"))).toBe(true);
+      expect(existsSync(join(hostDir, ".drover", "Dockerfile"))).toBe(true);
       // But the temporary patches dir should still be cleaned up
-      expect(existsSync(join(hostDir, ".sandcastle", "patches"))).toBe(false);
+      expect(existsSync(join(hostDir, ".drover", "patches"))).toBe(false);
     } finally {
       await handle.close();
     }
@@ -423,7 +423,7 @@ describe("syncOut", () => {
       }
 
       // Verify patch artifacts are preserved
-      const patchesDir = join(hostDir, ".sandcastle", "patches");
+      const patchesDir = join(hostDir, ".drover", "patches");
       expect(existsSync(patchesDir)).toBe(true);
 
       const timestampDirs = await readdir(patchesDir);
@@ -476,7 +476,7 @@ describe("syncOut", () => {
       }
 
       // Verify patch artifacts are preserved
-      const patchesDir = join(hostDir, ".sandcastle", "patches");
+      const patchesDir = join(hostDir, ".drover", "patches");
       expect(existsSync(patchesDir)).toBe(true);
 
       const timestampDirs = await readdir(patchesDir);
@@ -616,7 +616,7 @@ describe("syncOut", () => {
       );
       expect(hostHeadAfterRun2.trim()).toBe(hostHeadAfterRun1.trim());
 
-      const patchesDir = join(hostDir, ".sandcastle", "patches");
+      const patchesDir = join(hostDir, ".drover", "patches");
       expect(existsSync(patchesDir)).toBe(false);
     } finally {
       await handle.close();

@@ -14,7 +14,7 @@ Add a file-based lock to prevent concurrent access to a **worktree**. The lock i
 
 ### Lock location and naming
 
-Lock files live in the **config directory** at `.sandcastle/locks/<name>.lock`, where `<name>` matches the **worktree** directory name under `.sandcastle/worktrees/<name>/`. This keeps locks separate from **worktree** contents (invisible to the **agent**) and provides a 1:1 mapping between **worktrees** and locks.
+Lock files live in the **config directory** at `.drover/locks/<name>.lock`, where `<name>` matches the **worktree** directory name under `.drover/worktrees/<name>/`. This keeps locks separate from **worktree** contents (invisible to the **agent**) and provides a 1:1 mapping between **worktrees** and locks.
 
 ### Lock content
 
@@ -53,12 +53,12 @@ Only the **branch** strategy is affected. The **merge-to-head** strategy creates
 ### Rejected alternatives
 
 - **Wait/retry on contention.** Adds complexity (backoff, timeout, cancellation) for a scenario that indicates a caller error. Consistent with the project's fail-fast philosophy.
-- **Lock inside the worktree** (e.g. `<worktree-path>/.sandcastle.lock`). Visible to the **agent**, which could delete or commit it. Would require `.gitignore` management.
+- **Lock inside the worktree** (e.g. `<worktree-path>/.drover.lock`). Visible to the **agent**, which could delete or commit it. Would require `.gitignore` management.
 - **In-memory mutex/semaphore.** Only protects within a single Node process. The threat model is two separate processes — e.g. two `run()` calls from different terminals or CI jobs.
 
 ## Consequences
 
 - Two concurrent `run()` or `interactive()` calls targeting the same branch get a clear error on the second call, rather than silently sharing a **worktree**.
-- The `.sandcastle/locks/` directory becomes a new managed directory in the **config directory**.
+- The `.drover/locks/` directory becomes a new managed directory in the **config directory**.
 - A crashed process does not permanently lock a **worktree** — stale detection via PID liveness check ensures recovery.
 - This closes the open thread from ADR 0003: "Worktree locking (#401) is a future mitigation for the concurrent-access risk this opens up."

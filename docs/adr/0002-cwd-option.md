@@ -10,9 +10,9 @@ A `cwd` option addresses this, but raises a question: when a user passes `cwd: "
 
 Add `cwd?: string` to all four programmatic entry points. Relative paths resolve against `process.cwd()`; absolute pass through. Default is `process.cwd()`. The CLI does not get `--cwd` — users `cd` first.
 
-`promptFile` is **not** re-rooted under `cwd`. It is resolved as an ordinary Node file path, against `process.cwd()`. Only host-repo-derived paths (`.sandcastle/worktrees/`, `.sandcastle/.env`, `.sandcastle/logs/`, `.sandcastle/patches/`) follow `cwd`.
+`promptFile` is **not** re-rooted under `cwd`. It is resolved as an ordinary Node file path, against `process.cwd()`. Only host-repo-derived paths (`.drover/worktrees/`, `.drover/.env`, `.drover/logs/`, `.drover/patches/`) follow `cwd`.
 
-The rejected alternative was to resolve relative `promptFile` against `cwd`, so `"./.sandcastle/prompt.md"` would always mean "the prompt inside the sandcastle project." That reads natural in examples, but it makes `promptFile` behave unlike every other file path a user passes to a Node API — surprising when debugging.
+The rejected alternative was to resolve relative `promptFile` against `cwd`, so `"./.drover/prompt.md"` would always mean "the prompt inside the drover project." That reads natural in examples, but it makes `promptFile` behave unlike every other file path a user passes to a Node API — surprising when debugging.
 
 ## Consequences
 

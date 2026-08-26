@@ -184,12 +184,12 @@ describe("transferCodexSession", () => {
 
 describe("findClaudeSessionOnHost", () => {
   it("finds a session by id regardless of which encoded project dir holds it", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-find-claude-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-find-claude-"));
     try {
       const id = "session-xyz";
       const projectDir = join(
         dir,
-        "-private-tmp-myrepo--sandcastle-worktrees-feature",
+        "-private-tmp-myrepo--drover-worktrees-feature",
       );
       await mkdir(projectDir, { recursive: true });
       await writeFile(join(projectDir, `${id}.jsonl`), "{}");
@@ -204,7 +204,7 @@ describe("findClaudeSessionOnHost", () => {
   });
 
   it("returns undefined path and names the searched root when absent", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-find-claude-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-find-claude-"));
     try {
       const result = await findClaudeSessionOnHost("nope", dir);
       expect(result.path).toBeUndefined();
@@ -217,7 +217,7 @@ describe("findClaudeSessionOnHost", () => {
   it("returns undefined path when the projects dir does not exist", async () => {
     const result = await findClaudeSessionOnHost(
       "nope",
-      join(tmpdir(), "sandcastle-does-not-exist-xyz"),
+      join(tmpdir(), "drover-does-not-exist-xyz"),
     );
     expect(result.path).toBeUndefined();
   });
@@ -229,7 +229,7 @@ describe("findClaudeSessionOnHost", () => {
 
 describe("findCodexSessionOnHost", () => {
   it("finds a date-nested rollout file by id", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-find-codex-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-find-codex-"));
     try {
       const id = "9ba1c695-2222-4444-8888-e7e847bf34dd";
       const sessionPath = join(
@@ -252,7 +252,7 @@ describe("findCodexSessionOnHost", () => {
   });
 
   it("returns undefined path and names the searched root when absent", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-find-codex-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-find-codex-"));
     try {
       const result = await findCodexSessionOnHost("missing", dir);
       expect(result.path).toBeUndefined();
@@ -265,7 +265,7 @@ describe("findCodexSessionOnHost", () => {
 
 describe("locateCodexHostSession", () => {
   it("returns absolute path and relative date-nested path", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-locate-codex-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-locate-codex-"));
     try {
       const id = "9ba1c695-2222-4444-8888-e7e847bf34dd";
       const relativePath = join(
@@ -404,7 +404,7 @@ describe("transferPiSession", () => {
 
 describe("findPiSessionOnHost", () => {
   it("finds a session by id under its --<enc-cwd>-- directory", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-find-pi-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-find-pi-"));
     try {
       const id = "9ba1c695-2222-4444-8888-e7e847bf34dd";
       const filename = `2026-05-29T08-00-00_${id}.jsonl`;
@@ -422,7 +422,7 @@ describe("findPiSessionOnHost", () => {
   });
 
   it("returns undefined path and names the searched root when absent", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-find-pi-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-find-pi-"));
     try {
       const result = await findPiSessionOnHost("missing", dir);
       expect(result.path).toBeUndefined();
@@ -435,7 +435,7 @@ describe("findPiSessionOnHost", () => {
   it("returns undefined path when the sessions dir does not exist", async () => {
     const result = await findPiSessionOnHost(
       "nope",
-      join(tmpdir(), "sandcastle-pi-does-not-exist-xyz"),
+      join(tmpdir(), "drover-pi-does-not-exist-xyz"),
     );
     expect(result.path).toBeUndefined();
   });
@@ -443,7 +443,7 @@ describe("findPiSessionOnHost", () => {
 
 describe("locatePiHostSession", () => {
   it("returns absolute path and the --<enc-cwd>--/<filename> relative path", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-locate-pi-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-locate-pi-"));
     try {
       const id = "9ba1c695-2222-4444-8888-e7e847bf34dd";
       const filename = `2026-05-29T08-00-00_${id}.jsonl`;
@@ -462,7 +462,7 @@ describe("locatePiHostSession", () => {
   });
 
   it("throws naming the searched root when the session is missing", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-locate-pi-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-locate-pi-"));
     try {
       await expect(locatePiHostSession("missing", dir)).rejects.toThrow(
         `session missing not found in ${dir}`,
@@ -515,7 +515,7 @@ describe("listClaudeSubagentSessionsInSandbox", () => {
   });
 
   it("returns absolute paths of agent-*.jsonl files in the subagents dir", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-sub-list-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-sub-list-"));
     try {
       const sessionId = "abc-123";
       const subagentsDir = join(dir, "-sandbox-repo", sessionId, "subagents");
@@ -542,7 +542,7 @@ describe("listClaudeSubagentSessionsInSandbox", () => {
   });
 
   it("returns [] when the subagents dir does not exist (the normal case)", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-sub-nodir-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-sub-nodir-"));
     try {
       const result = await listClaudeSubagentSessionsInSandbox(
         "/sandbox/repo",
@@ -557,7 +557,7 @@ describe("listClaudeSubagentSessionsInSandbox", () => {
   });
 
   it("returns [] when the subagents dir is empty", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-sub-empty-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-sub-empty-"));
     try {
       const subagentsDir = join(dir, "-sandbox-repo", "abc-123", "subagents");
       await mkdir(subagentsDir, { recursive: true });

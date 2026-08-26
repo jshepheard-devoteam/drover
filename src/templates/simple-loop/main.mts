@@ -1,9 +1,9 @@
-import { run, claudeCode } from "@ai-hero/sandcastle";
-import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
+import { run, claudeCode } from "@devoteam/drover";
+import { docker } from "@devoteam/drover/sandboxes/docker";
 
 // Simple loop: an agent that picks open issues one by one and closes them.
-// Run this with: npx tsx .sandcastle/main.mts
-// Or add to package.json scripts: "sandcastle": "npx tsx .sandcastle/main.mts"
+// Run this with: npx tsx .drover/main.mts
+// Or add to package.json scripts: "drover": "npx tsx .drover/main.mts"
 
 await run({
   // A name for this run, shown as a prefix in log output.
@@ -19,7 +19,7 @@ await run({
 
   // Path to the prompt file. Shell expressions inside are evaluated inside the
   // sandbox at the start of each iteration, so the agent always sees fresh data.
-  promptFile: "./.sandcastle/prompt.md",
+  promptFile: "./.drover/prompt.md",
 
   // Maximum number of iterations (agent invocations) to run in a session.
   // Each iteration works on a single issue. Increase this to process more issues

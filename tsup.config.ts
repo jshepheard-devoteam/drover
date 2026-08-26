@@ -26,15 +26,15 @@ export default defineConfig({
   treeshake: true,
   external: ["@vercel/sandbox", "@daytona/sdk"],
   define: {
-    __SANDCASTLE_VERSION__: JSON.stringify(pkg.version),
+    __DROVER_VERSION__: JSON.stringify(pkg.version),
   },
   // Some bundled CJS dependencies (notably `undici` via `@effect/platform-node`)
   // use `require()` of Node built-ins. ESM has no `require`, so we install one
   // via `createRequire` so the bundled CJS-shaped code keeps working.
   banner: {
     js: [
-      "import { createRequire as __sandcastleCreateRequire } from 'node:module';",
-      "const require = __sandcastleCreateRequire(import.meta.url);",
+      "import { createRequire as __droverCreateRequire } from 'node:module';",
+      "const require = __droverCreateRequire(import.meta.url);",
     ].join("\n"),
   },
 });

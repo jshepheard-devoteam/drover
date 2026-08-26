@@ -13,7 +13,7 @@ const SHELL_BLOCK_PATTERN = /!`([^`]+)`/g;
 export type PromptArgs = Record<string, string | number | boolean>;
 
 /**
- * Prompt argument keys that Sandcastle injects automatically.
+ * Prompt argument keys that Drover injects automatically.
  * These cannot be overridden via `promptArgs`.
  */
 export const BUILT_IN_PROMPT_ARG_KEYS = [

@@ -85,7 +85,7 @@ describe("interactive()", () => {
 
   beforeEach(() => {
     originalCwd = process.cwd();
-    hostDir = mkdtempSync(join(tmpdir(), "sandcastle-interactive-test-"));
+    hostDir = mkdtempSync(join(tmpdir(), "drover-interactive-test-"));
     // Initialize a git repo
     execSync("git init", { cwd: hostDir, stdio: "ignore" });
     execSync('git config user.email "test@test.com"', {
@@ -595,7 +595,7 @@ describe("interactive()", () => {
     const provider = createBindMountSandboxProvider({
       name: "failing-create",
       create: async () => {
-        throw new Error("Image 'sandcastle:test' not found locally");
+        throw new Error("Image 'drover:test' not found locally");
       },
     });
 
@@ -609,7 +609,7 @@ describe("interactive()", () => {
     ).rejects.toThrow();
 
     // The worktree must not be left orphaned on disk.
-    const worktreesDir = join(hostDir, ".sandcastle", "worktrees");
+    const worktreesDir = join(hostDir, ".drover", "worktrees");
     const leftover = existsSync(worktreesDir) ? readdirSync(worktreesDir) : [];
     expect(leftover).toHaveLength(0);
   });
@@ -720,7 +720,7 @@ describe("interactive()", () => {
 
   it("uses cwd as host repo directory for worktree placement", async () => {
     // Create a second git repo in a separate temp dir
-    const otherRepo = mkdtempSync(join(tmpdir(), "sandcastle-cwd-test-"));
+    const otherRepo = mkdtempSync(join(tmpdir(), "drover-cwd-test-"));
     execSync("git init", { cwd: otherRepo, stdio: "ignore" });
     execSync('git config user.email "test@test.com"', {
       cwd: otherRepo,
@@ -749,7 +749,7 @@ describe("interactive()", () => {
     });
 
     expect(result.exitCode).toBe(0);
-    // The worktree should be under the other repo's .sandcastle/worktrees/ dir
+    // The worktree should be under the other repo's .drover/worktrees/ dir
     expect(worktreeCwd).toBeDefined();
     expect(worktreeCwd!.startsWith(otherRepo)).toBe(true);
   });

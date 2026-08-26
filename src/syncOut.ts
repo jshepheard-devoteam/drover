@@ -3,7 +3,7 @@
  *
  * Two-phase approach:
  * 1. Save phase: eagerly save all artifacts (patches, diff, untracked files)
- *    to `.sandcastle/patches/<timestamp>/` before attempting to apply.
+ *    to `.drover/patches/<timestamp>/` before attempting to apply.
  * 2. Apply phase: apply from the saved directory.
  *    - On success: clean up the patch directory.
  *    - On failure: preserve the patch directory and print recovery commands.
@@ -35,7 +35,7 @@ import { SyncError } from "./errors.js";
  * git repo (not the host's), survives across `run()` calls on the same handle,
  * and never crosses to the host — sync-out ships commits, not refs. ADR 0017.
  */
-export const SYNC_BASE_REF = "refs/sandcastle/sync-base";
+export const SYNC_BASE_REF = "refs/drover/sync-base";
 
 /**
  * Execute a command on the host side, returning stdout.
@@ -142,7 +142,7 @@ const createPatchDir = (
       const pad = (n: number) => String(n).padStart(2, "0");
       const base = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 
-      const patchesRoot = join(hostRepoDir, ".sandcastle", "patches");
+      const patchesRoot = join(hostRepoDir, ".drover", "patches");
       await mkdir(patchesRoot, { recursive: true });
 
       let dirName = base;
@@ -213,7 +213,7 @@ export const countCommitsToSync = (
  * Sync changes from an isolated sandbox back to the host repo.
  *
  * Two-phase extraction with artifact persistence:
- * 1. Save all artifacts to `.sandcastle/patches/<timestamp>/`
+ * 1. Save all artifacts to `.drover/patches/<timestamp>/`
  * 2. Apply from saved directory; on failure, preserve artifacts and print recovery
  */
 export const syncOut = (
@@ -278,7 +278,7 @@ export const syncOut = (
 
     // --- Phase 1: Save all artifacts ---
     const patchDir = yield* createPatchDir(hostRepoDir);
-    const relativePatchDir = join(".sandcastle", "patches", basename(patchDir));
+    const relativePatchDir = join(".drover", "patches", basename(patchDir));
 
     const nonEmptyPatches: string[] = [];
 
@@ -286,7 +286,7 @@ export const syncOut = (
     if (hasCommits) {
       const mkTempResult = yield* execOk(
         handle,
-        "mktemp -d -t sandcastle-patches-XXXXXX",
+        "mktemp -d -t drover-patches-XXXXXX",
       );
       const sandboxPatchDir = mkTempResult.stdout.trim();
 
@@ -433,7 +433,7 @@ export const syncOut = (
       yield* Effect.tryPromise({
         try: async () => {
           await rm(patchDir, { recursive: true, force: true });
-          const patchesRoot = join(hostRepoDir, ".sandcastle", "patches");
+          const patchesRoot = join(hostRepoDir, ".drover", "patches");
           try {
             const remaining = await readdir(patchesRoot);
             if (remaining.length === 0) {

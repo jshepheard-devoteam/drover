@@ -1,8 +1,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFileSync } from "node:child_process";
-import * as sandcastle from "@ai-hero/sandcastle";
-import { noSandbox } from "@ai-hero/sandcastle/sandboxes/no-sandbox";
+import * as drover from "@devoteam/drover";
+import { noSandbox } from "@devoteam/drover/sandboxes/no-sandbox";
 import {
   asRecord,
   asString,
@@ -75,7 +75,7 @@ try {
       BRANCH,
       BASE_REF,
     },
-    output: sandcastle.Output.object({
+    output: drover.Output.object({
       tag: "output",
       schema: updateBranchOutputSchema,
     }),

@@ -8,11 +8,11 @@ import type { SandboxProvider } from "./SandboxProvider.js";
  * The lookup strategy depends on the sandbox:
  *
  * - **No-sandbox**: the agent runs directly on the host and writes its session
- *   in place under a cwd-derived directory; Sandcastle never moves it. The
+ *   in place under a cwd-derived directory; Drover never moves it. The
  *   agent's own path encoding (realpath canonicalisation plus
  *   non-alphanumeric → hyphen) is fragile and platform-specific to reconstruct,
  *   so we locate the file by its globally-unique session id instead.
- * - **Sandboxed (bind-mount)**: Sandcastle's capture transfers the session into
+ * - **Sandboxed (bind-mount)**: Drover's capture transfers the session into
  *   the host store keyed on the host repo dir, so for a resumable run the file
  *   lives at that exact encoded location — check it directly rather than
  *   scanning. (Isolated sandboxes fall here too, but neither capture nor resume

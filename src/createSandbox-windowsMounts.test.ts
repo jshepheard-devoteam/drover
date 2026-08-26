@@ -113,7 +113,7 @@ describe("createSandbox Windows mount patching", () => {
       // gitMounts should be an array (possibly empty if no parent .git)
       expect(Array.isArray(gitMounts)).toBe(true);
       // worktreePath should be the created worktree path
-      expect(calledWorktreePath).toContain(".sandcastle/worktrees");
+      expect(calledWorktreePath).toContain(".drover/worktrees");
       // sandboxRepoDir should be the canonical sandbox dir
       expect(sandboxRepoDir).toBe(SANDBOX_REPO_DIR);
     } finally {
@@ -127,7 +127,7 @@ describe("createSandbox Windows mount patching", () => {
     await commitFile(hostDir, "init.txt", "init", "initial commit");
 
     // Create a worktree to pass to createSandboxFromWorktree
-    const worktreePath = join(hostDir, ".sandcastle", "worktrees", "test-wt");
+    const worktreePath = join(hostDir, ".drover", "worktrees", "test-wt");
     await execAsync(`git worktree add "${worktreePath}" -b test-wt-branch`, {
       cwd: hostDir,
     });

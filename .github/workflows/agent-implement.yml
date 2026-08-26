@@ -122,8 +122,8 @@ jobs:
         env:
           BRANCH: ${{ steps.branch.outputs.name }}
         run: |
-          git config user.name "sandcastle-agent[bot]"
-          git config user.email "sandcastle-agent[bot]@users.noreply.github.com"
+          git config user.name "drover-agent[bot]"
+          git config user.email "drover-agent[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
 
       - name: Setup Node.js
@@ -150,7 +150,7 @@ jobs:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           BRANCH: ${{ steps.branch.outputs.name }}
           OUTPUT_DIR: ${{ runner.temp }}
-        run: npx tsx .sandcastle/agent-workflows/implement/implement.ts
+        run: npx tsx .drover/agent-workflows/implement/implement.ts
 
       - name: Push branch
         if: steps.shape.outputs.proceed == 'true' && steps.preflight.outputs.refused != 'true' && success()
@@ -170,7 +170,7 @@ jobs:
           {
             echo "Closes #${ISSUE_NUMBER}"
             echo
-            echo "Implemented by the Sandcastle agent workflow."
+            echo "Implemented by the Drover agent workflow."
           } > "$body_file"
           pr_url=$(gh pr create --draft --base main --head "$BRANCH" --title "$title" --body-file "$body_file" | tail -n1)
           echo "pr_number=$(basename "$pr_url")" >> "$GITHUB_OUTPUT"

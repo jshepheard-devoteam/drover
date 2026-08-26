@@ -319,7 +319,7 @@ export const WorktreeDockerSandboxFactory = {
           Effect.catchAll((e) =>
             Effect.sync(() => {
               console.error(
-                "[sandcastle] Warning: failed to prune stale worktrees:",
+                "[drover] Warning: failed to prune stale worktrees:",
                 e.message,
               );
             }),

@@ -49,21 +49,19 @@ const parseEnvFile = (
 /**
  * Resolve all env vars from .env files with process.env fallback.
  *
- * Precedence: .sandcastle/.env > process.env
- * Only keys declared in .sandcastle/.env are resolved from process.env.
+ * Precedence: .drover/.env > process.env
+ * Only keys declared in .drover/.env are resolved from process.env.
  * Repo root .env is not part of the resolution chain.
  */
 export const resolveEnv = (
   repoDir: string,
 ): Effect.Effect<Record<string, string>, never, FileSystem.FileSystem> =>
   Effect.gen(function* () {
-    const sandcastleEnv = yield* parseEnvFile(
-      join(repoDir, ".sandcastle", ".env"),
-    );
+    const droverEnv = yield* parseEnvFile(join(repoDir, ".drover", ".env"));
 
     const result: Record<string, string> = {};
-    for (const key of Object.keys(sandcastleEnv)) {
-      const value = sandcastleEnv[key] || process.env[key];
+    for (const key of Object.keys(droverEnv)) {
+      const value = droverEnv[key] || process.env[key];
       if (value) {
         result[key] = value;
       }

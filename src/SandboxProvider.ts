@@ -1,7 +1,7 @@
 /**
  * Sandbox provider types — the pluggable interface for sandbox runtimes.
  *
- * Provider authors implement a small Promise-based interface. Sandcastle
+ * Provider authors implement a small Promise-based interface. Drover
  * handles worktree creation, git mount resolution, and commit extraction.
  */
 
@@ -28,7 +28,7 @@ export interface BindMountSandboxHandle {
    * Execute a command in the sandbox.
    *
    * Implementations MUST support line-by-line streaming via `onLine`. This is
-   * how Sandcastle delivers live feedback to the user and enforces idle timeouts —
+   * how Drover delivers live feedback to the user and enforces idle timeouts —
    * without a streaming implementation, neither will work. A buffered/batch
    * implementation that only calls `onLine` after the process exits does NOT
    * satisfy this contract.
@@ -105,7 +105,7 @@ export interface IsolatedSandboxHandle {
    * Execute a command in the sandbox.
    *
    * Implementations MUST support line-by-line streaming via `onLine`. This is
-   * how Sandcastle delivers live feedback to the user and enforces idle timeouts —
+   * how Drover delivers live feedback to the user and enforces idle timeouts —
    * without a streaming implementation, neither will work. A buffered/batch
    * implementation that only calls `onLine` after the process exits does NOT
    * satisfy this contract.
@@ -199,7 +199,7 @@ export interface NoSandboxHandle {
    * Execute a command on the host.
    *
    * Implementations MUST support line-by-line streaming via `onLine`. This is
-   * how Sandcastle delivers live feedback to the user and enforces idle timeouts —
+   * how Drover delivers live feedback to the user and enforces idle timeouts —
    * without a streaming implementation, neither will work.
    *
    * When `stdin` is set, the implementation pipes the string to the child

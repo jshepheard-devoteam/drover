@@ -27,11 +27,11 @@ export type SelinuxLabel = "z" | "Z" | false;
  * Deterministic mount point inside the sandbox for the parent repo's .git
  * directory when the workspace is a git worktree. See ADR-0006.
  */
-export const PARENT_GIT_SANDBOX_DIR = "/.sandcastle-parent-git";
+export const PARENT_GIT_SANDBOX_DIR = "/.drover-parent-git";
 
 /**
  * Derive the default image name from the repo directory.
- * Returns `sandcastle:<dir-name>` where dir-name is the last path segment,
+ * Returns `drover:<dir-name>` where dir-name is the last path segment,
  * lowercased and sanitized for image tag rules.
  *
  * Handles both POSIX (`/`) and Windows (`\`) path separators.
@@ -43,7 +43,7 @@ export const defaultImageName = (repoDir: string): string => {
       .split(/[\\/]/)
       .pop() ?? "local";
   const sanitized = dirName.toLowerCase().replace(/[^a-z0-9_.-]/g, "-");
-  return `sandcastle:${sanitized || "local"}`;
+  return `drover:${sanitized || "local"}`;
 };
 
 /**
@@ -272,7 +272,7 @@ export const patchGitMountsForWindows = (
     // Create a temp file with the corrected gitdir content
     const correctedGitdir = `${PARENT_GIT_SANDBOX_DIR}/worktrees/${worktreeName}`;
     const tempDir = yield* Effect.tryPromise({
-      try: () => mkdtemp(join(tmpdir(), "sandcastle-git-")),
+      try: () => mkdtemp(join(tmpdir(), "drover-git-")),
       catch: (e) =>
         new WorktreeError({
           message: `Failed to create temp dir for git override: ${e instanceof Error ? e.message : String(e)}`,
@@ -313,7 +313,7 @@ export const patchGitMountsForWindows = (
       }
     }
 
-    // If the .git file wasn't in gitMounts (Sandcastle-created worktree),
+    // If the .git file wasn't in gitMounts (Drover-created worktree),
     // add an overlay mount for the corrected .git file
     if (!replacedGitFile) {
       correctedMounts.push({

@@ -286,7 +286,7 @@ describe("claudeCode factory", () => {
   });
 
   it("buildPrintCommand omits --dangerously-skip-permissions when permissionMode is set", () => {
-    // Sandcastle's AFK call sites pass dangerouslySkipPermissions: true. When the
+    // Drover's AFK call sites pass dangerouslySkipPermissions: true. When the
     // user opts into a specific permission mode on the provider, that mode takes
     // precedence over the default bypass — they are mutually exclusive on claude's CLI.
     const provider = claudeCode("claude-opus-4-8", { permissionMode: "auto" });
@@ -2138,7 +2138,7 @@ describe("sessionStorage", () => {
   });
 
   it("claudeCode hostSessionFilePath is derivable without capture", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "sandcastle-claude-hostpath-"));
+    const dir = await mkdtemp(join(tmpdir(), "drover-claude-hostpath-"));
     try {
       const provider = claudeCode("claude-opus-4-8", {
         sessionStorage: { hostProjectsDir: dir },
@@ -2156,8 +2156,8 @@ describe("sessionStorage", () => {
   });
 
   it("pi captureToHost transfers a session JSONL with header cwd rewritten and lands it in the host-cwd-encoded dir", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-pi-hostpath-"));
-    const sandboxDir = await mkdtemp(join(tmpdir(), "sandcastle-pi-sbx-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-pi-hostpath-"));
+    const sandboxDir = await mkdtemp(join(tmpdir(), "drover-pi-sbx-"));
     try {
       const id = "9ba1c695-2222-4444-8888-e7e847bf34dd";
       const sandboxCwd = "/sandbox/repo";
@@ -2224,10 +2224,8 @@ describe("sessionStorage", () => {
   });
 
   it("pi resumeIntoSandbox transfers a host session into the sandbox-cwd-encoded dir with cwd rewritten", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-pi-resume-host-"));
-    const sandboxDir = await mkdtemp(
-      join(tmpdir(), "sandcastle-pi-resume-sbx-"),
-    );
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-pi-resume-host-"));
+    const sandboxDir = await mkdtemp(join(tmpdir(), "drover-pi-resume-sbx-"));
     try {
       const id = "9ba1c695-2222-4444-8888-e7e847bf34dd";
       const hostCwd = "/host/repo";
@@ -2286,7 +2284,7 @@ describe("sessionStorage", () => {
   });
 
   it("pi existsOnHost returns false when no matching session lives under the host root", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-pi-miss-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-pi-miss-"));
     try {
       const provider = pi("claude-sonnet-4-6", {
         sessionStorage: { hostSessionsDir: hostDir },
@@ -2300,8 +2298,8 @@ describe("sessionStorage", () => {
   });
 
   it("codex hostSessionFilePath returns the captured rollout file after captureToHost", async () => {
-    const hostDir = await mkdtemp(join(tmpdir(), "sandcastle-codex-hostpath-"));
-    const sandboxDir = await mkdtemp(join(tmpdir(), "sandcastle-codex-sbx-"));
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-codex-hostpath-"));
+    const sandboxDir = await mkdtemp(join(tmpdir(), "drover-codex-sbx-"));
     try {
       const id = "9ba1c695-2222-4444-8888-e7e847bf34dd";
       // Stage a sandbox-side rollout file mirroring Codex's YYYY/MM/DD layout.
@@ -2355,12 +2353,8 @@ describe("sessionStorage", () => {
   });
 
   it("claudeCode captureToHost copies the main session when no subagents dir exists", async () => {
-    const hostDir = await mkdtemp(
-      join(tmpdir(), "sandcastle-claude-sub-main-"),
-    );
-    const sandboxDir = await mkdtemp(
-      join(tmpdir(), "sandcastle-claude-sub-sbx-"),
-    );
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-claude-sub-main-"));
+    const sandboxDir = await mkdtemp(join(tmpdir(), "drover-claude-sub-sbx-"));
     try {
       const id = "session-only";
       const hostCwd = "/host/repo";
@@ -2397,11 +2391,9 @@ describe("sessionStorage", () => {
   });
 
   it("claudeCode captureToHost copies subagent/workflow logs alongside the main session with cwd rewritten", async () => {
-    const hostDir = await mkdtemp(
-      join(tmpdir(), "sandcastle-claude-sub-many-"),
-    );
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-claude-sub-many-"));
     const sandboxDir = await mkdtemp(
-      join(tmpdir(), "sandcastle-claude-sub-many-sbx-"),
+      join(tmpdir(), "drover-claude-sub-many-sbx-"),
     );
     try {
       const id = "session-with-subagents";
@@ -2484,11 +2476,9 @@ describe("sessionStorage", () => {
   });
 
   it("claudeCode captureToHost: a failing subagent copy logs a warning and lets siblings + main session through", async () => {
-    const hostDir = await mkdtemp(
-      join(tmpdir(), "sandcastle-claude-sub-fail-"),
-    );
+    const hostDir = await mkdtemp(join(tmpdir(), "drover-claude-sub-fail-"));
     const sandboxDir = await mkdtemp(
-      join(tmpdir(), "sandcastle-claude-sub-fail-sbx-"),
+      join(tmpdir(), "drover-claude-sub-fail-sbx-"),
     );
     try {
       const id = "session-flaky-sub";

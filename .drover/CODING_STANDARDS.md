@@ -72,7 +72,7 @@ Optional parameters passed to functions should be scrutinised extremely carefull
 
 ---
 
-Every interactive prompt in the `sandcastle init` flow must be paired with a non-interactive CLI flag that resolves the same choice. They are linked: adding a new prompt without adding the matching flag breaks scripted / CI setup (no TTY → the prompt wedges or crashes), and adding a flag without wiring it into the prompt path leaves the interactive experience inconsistent. When stdin is not a TTY and the flag is absent for a prompt that would otherwise fire, fail fast with a message naming the missing flag rather than letting the prompt library crash. New prompt + new flag land in the same change.
+Every interactive prompt in the `drover init` flow must be paired with a non-interactive CLI flag that resolves the same choice. They are linked: adding a new prompt without adding the matching flag breaks scripted / CI setup (no TTY → the prompt wedges or crashes), and adding a flag without wiring it into the prompt path leaves the interactive experience inconsistent. When stdin is not a TTY and the flag is absent for a prompt that would otherwise fire, fail fast with a message naming the missing flag rather than letting the prompt library crash. New prompt + new flag land in the same change.
 
 ---
 

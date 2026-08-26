@@ -131,7 +131,7 @@ function assertCursorPrintPromptFitsArgv(prompt: string): void {
   const n = Buffer.byteLength(prompt, "utf8");
   if (n > CURSOR_PRINT_PROMPT_MAX_BYTES) {
     throw new Error(
-      `Cursor print-mode prompt is ${n} bytes (max ${CURSOR_PRINT_PROMPT_MAX_BYTES} bytes). The Cursor CLI accepts the prompt only as a command-line argument; shorten the prompt or split the work. Other Sandcastle providers use stdin for large prompts.`,
+      `Cursor print-mode prompt is ${n} bytes (max ${CURSOR_PRINT_PROMPT_MAX_BYTES} bytes). The Cursor CLI accepts the prompt only as a command-line argument; shorten the prompt or split the work. Other Drover providers use stdin for large prompts.`,
     );
   }
 }
@@ -254,7 +254,7 @@ export interface AgentSessionStorage {
   /**
    * Locate a session on the host by its unique id, independent of cwd encoding.
    * Used by the no-sandbox resume precheck, where the agent runs on the host and
-   * writes the session in place under a cwd-derived directory Sandcastle cannot
+   * writes the session in place under a cwd-derived directory Drover cannot
    * reliably reconstruct. Returns the located path (or `undefined`) plus the
    * directory that was searched (for not-found errors).
    */
@@ -292,7 +292,7 @@ const readSandboxFile = async (
 ): Promise<string> => {
   const tmpPath = join(
     tmpdir(),
-    `sandcastle-${tag}-${Date.now()}-${Math.random().toString(36).slice(2)}.jsonl`,
+    `drover-${tag}-${Date.now()}-${Math.random().toString(36).slice(2)}.jsonl`,
   );
   await handle.copyFileOut(sandboxPath, tmpPath);
   try {
@@ -310,7 +310,7 @@ const writeSandboxFile = async (
 ): Promise<void> => {
   const tmpPath = join(
     tmpdir(),
-    `sandcastle-${tag}-${Date.now()}-${Math.random().toString(36).slice(2)}.jsonl`,
+    `drover-${tag}-${Date.now()}-${Math.random().toString(36).slice(2)}.jsonl`,
   );
   await writeFile(tmpPath, content);
   try {
@@ -412,7 +412,7 @@ const makeClaudeSessionStorage = (
           });
         } catch (err) {
           console.error(
-            `sandcastle: failed to capture Claude subagent transcript ${sandboxSubagentPath}: ${
+            `drover: failed to capture Claude subagent transcript ${sandboxSubagentPath}: ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -789,7 +789,7 @@ export const codex = (
       : "";
     // auto_review only fires on interactive approvals, so the bypass flag is
     // dropped in favour of `-a on-request`. `-s danger-full-access` disables
-    // Codex's own filesystem sandbox — Sandcastle owns that boundary, and
+    // Codex's own filesystem sandbox — Drover owns that boundary, and
     // here the reviewer agent owns the per-action approval boundary.
     const approvalsFlags =
       options?.approvalsReviewer === "auto_review"
@@ -948,7 +948,7 @@ export interface OpenCodeOptions {
   readonly variant?: string;
   /**
    * Named OpenCode agent/mode to run, mapped to OpenCode's own `--agent` flag
-   * (e.g. "build", "plan"). This is distinct from Sandcastle's `--agent`
+   * (e.g. "build", "plan"). This is distinct from Drover's `--agent`
    * provider selector — it chooses an agent *inside* OpenCode.
    */
   readonly agent?: string;
@@ -1014,7 +1014,7 @@ function assertCopilotPrintPromptFitsArgv(prompt: string): void {
   const n = Buffer.byteLength(prompt, "utf8");
   if (n > COPILOT_PRINT_PROMPT_MAX_BYTES) {
     throw new Error(
-      `Copilot print-mode prompt is ${n} bytes (max ${COPILOT_PRINT_PROMPT_MAX_BYTES} bytes). This provider passes the prompt as a command-line argument; shorten the prompt or split the work. Other Sandcastle providers use stdin for large prompts.`,
+      `Copilot print-mode prompt is ${n} bytes (max ${COPILOT_PRINT_PROMPT_MAX_BYTES} bytes). This provider passes the prompt as a command-line argument; shorten the prompt or split the work. Other Drover providers use stdin for large prompts.`,
     );
   }
 }
@@ -1165,7 +1165,7 @@ export interface ClaudeCodeOptions {
   };
   /**
    * Maps directly to Claude's `--permission-mode` flag. When set, replaces the
-   * default `--dangerously-skip-permissions` Sandcastle passes on AFK runs —
+   * default `--dangerously-skip-permissions` Drover passes on AFK runs —
    * the two flags are mutually exclusive on Claude's CLI. Use `"auto"` for
    * AI-mediated per-tool approve/deny on unsandboxed host runs.
    */
@@ -1195,7 +1195,7 @@ export const claudeCode = (
   }: AgentCommandOptions): PrintCommand {
     // permissionMode and --dangerously-skip-permissions are mutually exclusive
     // on Claude's CLI; an explicit mode on the provider takes precedence over
-    // Sandcastle's default bypass.
+    // Drover's default bypass.
     const permissionFlag = options?.permissionMode
       ? ` --permission-mode ${options.permissionMode}`
       : dangerouslySkipPermissions

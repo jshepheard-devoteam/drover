@@ -5,11 +5,11 @@ description: Learn about agent providers and how to configure them.
 
 ## Overview
 
-An agent provider defines how Sandcastle interacts with a specific AI coding tool. Each provider declares:
+An agent provider defines how Drover interacts with a specific AI coding tool. Each provider declares:
 
 - An **env manifest** -- which environment variables it requires
 - An **env check** -- validation that runs before the agent starts
-- A **Dockerfile template** -- used during `sandcastle init` to scaffold the sandbox
+- A **Dockerfile template** -- used during `drover init` to scaffold the sandbox
 
 ## Built-in Providers
 
@@ -32,7 +32,7 @@ Plus:
 
 ### OpenCode
 
-Uses OpenCode as the AI coding agent. Sandcastle runs it with `--format json` and parses the structured event stream to surface live text, tool calls, and the session ID.
+Uses OpenCode as the AI coding agent. Drover runs it with `--format json` and parses the structured event stream to surface live text, tool calls, and the session ID.
 
 Required environment variables:
 

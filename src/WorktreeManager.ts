@@ -72,8 +72,8 @@ const execGit = (
 
 /**
  * Generates a temporary branch name.
- * When name is provided: `sandcastle/<sanitized-name>/<YYYYMMDD-HHMMSS>-<random>`.
- * Otherwise: `sandcastle/<YYYYMMDD-HHMMSS>-<random>`.
+ * When name is provided: `drover/<sanitized-name>/<YYYYMMDD-HHMMSS>-<random>`.
+ * Otherwise: `drover/<YYYYMMDD-HHMMSS>-<random>`.
  *
  * The random suffix prevents collisions between concurrent calls within the
  * same wall-clock second — relevant for fan-out via `RunResult.fork()` and
@@ -83,9 +83,9 @@ export const generateTempBranchName = (name?: string): string => {
   const ts = formatTimestamp(new Date());
   const suffix = randomBranchSuffix();
   if (name) {
-    return `sandcastle/${sanitizeName(name)}/${ts}-${suffix}`;
+    return `drover/${sanitizeName(name)}/${ts}-${suffix}`;
   }
-  return `sandcastle/${ts}-${suffix}`;
+  return `drover/${ts}-${suffix}`;
 };
 
 /** Returns the name of the currently checked-out branch in the given repo directory. */
@@ -135,7 +135,7 @@ export const findCollidingWorktree = (
 
 /**
  * Whether `worktreePath` lives under `worktreesDir` (i.e. is a worktree managed
- * by sandcastle rather than the main working tree or an external worktree).
+ * by drover rather than the main working tree or an external worktree).
  * Separators are normalized so the check holds on Windows.
  */
 export const isManagedWorktreePath = (
@@ -145,7 +145,7 @@ export const isManagedWorktreePath = (
   normalizePath(worktreePath).startsWith(normalizePath(worktreesDir));
 
 /**
- * Whether a directory entry under `.sandcastle/worktrees/` is orphaned — not
+ * Whether a directory entry under `.drover/worktrees/` is orphaned — not
  * present in the set of active worktree paths reported by git. Both sides are
  * normalized so paths from `join` (backslashes on Windows) match git's
  * forward-slash output.
@@ -275,10 +275,10 @@ const fastForwardFromOrigin = (
   });
 
 /**
- * Creates a git worktree at `.sandcastle/worktrees/<name>/`.
+ * Creates a git worktree at `.drover/worktrees/<name>/`.
  *
  * - If `branch` is specified, checks out that branch.
- * - If not, creates a temporary `sandcastle/<timestamp>` branch.
+ * - If not, creates a temporary `drover/<timestamp>` branch.
  *
  * When `branch` collides with an existing managed worktree:
  * - Clean → reuses the existing worktree and fast-forwards it from
@@ -302,7 +302,7 @@ export const create = (
 > =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
-    const worktreesDir = join(repoDir, ".sandcastle", "worktrees");
+    const worktreesDir = join(repoDir, ".drover", "worktrees");
     yield* fs
       .makeDirectory(worktreesDir, { recursive: true })
       .pipe(Effect.mapError((e) => new WorktreeError({ message: e.message })));
@@ -318,11 +318,11 @@ export const create = (
       const suffix = randomBranchSuffix();
       if (opts?.name) {
         const sanitized = sanitizeName(opts.name);
-        branch = `sandcastle/${sanitized}/${timestamp}-${suffix}`;
-        worktreeName = `sandcastle-${sanitized}-${timestamp}-${suffix}`;
+        branch = `drover/${sanitized}/${timestamp}-${suffix}`;
+        worktreeName = `drover-${sanitized}-${timestamp}-${suffix}`;
       } else {
-        branch = `sandcastle/${timestamp}-${suffix}`;
-        worktreeName = `sandcastle-${timestamp}-${suffix}`;
+        branch = `drover/${timestamp}-${suffix}`;
+        worktreeName = `drover-${timestamp}-${suffix}`;
       }
     }
 
@@ -335,7 +335,7 @@ export const create = (
       const existing = yield* listWorktrees(repoDir);
       const collision = findCollidingWorktree(existing, branch, worktreePath);
       if (collision) {
-        // Only reuse worktrees managed by sandcastle (under .sandcastle/worktrees/)
+        // Only reuse worktrees managed by drover (under .drover/worktrees/)
         if (isManagedWorktreePath(collision.path, worktreesDir)) {
           const dirty = yield* hasUncommittedChanges(collision.path);
           if (dirty) {
@@ -354,7 +354,7 @@ export const create = (
           new WorktreeError({
             message:
               `Branch '${branch}' is already checked out in worktree at '${collision.path}'. ` +
-              `Sandcastle's branch and merge-to-head strategies run the agent in a git worktree under .sandcastle/worktrees/, ` +
+              `Drover's branch and merge-to-head strategies run the agent in a git worktree under .drover/worktrees/, ` +
               `and git refuses to check out the same branch in two worktrees at once (HEAD would become ambiguous). ` +
               `Pick a different branch, or switch the main working tree to a different branch before re-running.`,
           }),
@@ -441,13 +441,13 @@ export const hasUncommittedChanges = (
 /**
  * Removes a worktree and its git metadata.
  *
- * The `worktreePath` must be a path inside `.sandcastle/worktrees/` so that
+ * The `worktreePath` must be a path inside `.drover/worktrees/` so that
  * the main repository directory can be derived from it.
  */
 export const remove = (
   worktreePath: string,
 ): Effect.Effect<void, WorktreeError> => {
-  // Derive the main repo dir: worktreePath = <repoDir>/.sandcastle/worktrees/<name>
+  // Derive the main repo dir: worktreePath = <repoDir>/.drover/worktrees/<name>
   const repoDir = join(worktreePath, "..", "..", "..");
   return execGit(["worktree", "remove", "--force", worktreePath], repoDir).pipe(
     Effect.asVoid,
@@ -456,7 +456,7 @@ export const remove = (
 
 /**
  * Prunes stale git worktree metadata and removes orphaned directories under
- * `.sandcastle/worktrees/`.
+ * `.drover/worktrees/`.
  */
 export const pruneStale = (
   repoDir: string,
@@ -471,7 +471,7 @@ export const pruneStale = (
     // Let git clean up metadata for worktrees whose directories are gone
     yield* execGit(["worktree", "prune"], repoDir);
 
-    const worktreesDir = join(repoDir, ".sandcastle", "worktrees");
+    const worktreesDir = join(repoDir, ".drover", "worktrees");
 
     // Read directory entries — return null if directory doesn't exist
     const entries: string[] | null = yield* fs.readDirectory(worktreesDir).pipe(
@@ -487,7 +487,7 @@ export const pruneStale = (
     if (entries === null) return;
 
     // `git worktree list` canonicalizes paths via realpath. If repoDir or
-    // .sandcastle is a symlink, joining the un-canonicalized prefix produces
+    // .drover is a symlink, joining the un-canonicalized prefix produces
     // strings that never match git's output, and every active worktree looks
     // orphaned. Resolve the prefix once so the Set lookup below works.
     const realWorktreesDir = yield* fs
@@ -506,7 +506,7 @@ export const pruneStale = (
         .map((line) => line.slice("worktree ".length).trim()),
     );
 
-    // Remove any directory under .sandcastle/worktrees/ that is not an active worktree
+    // Remove any directory under .drover/worktrees/ that is not an active worktree
     for (const entry of entries) {
       const entryPath = join(realWorktreesDir, entry);
       const isDir = yield* fs.stat(entryPath).pipe(

@@ -27,11 +27,11 @@ const dockerExec = (args: string[]): Effect.Effect<string, DockerError> =>
   });
 
 /**
- * Build the sandcastle Docker image.
+ * Build the drover Docker image.
  *
  * When `dockerfile` is provided, uses `docker build -f <dockerfile> <cwd>`
  * so COPY instructions resolve relative to the current working directory.
- * Otherwise, uses `docker build <dockerfileDir>` (the default .sandcastle/ directory).
+ * Otherwise, uses `docker build <dockerfileDir>` (the default .drover/ directory).
  */
 export const buildImage = (
   imageName: string,

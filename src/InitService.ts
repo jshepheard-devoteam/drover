@@ -15,7 +15,7 @@ worktrees/
  * so it is defined once here.
  */
 const SETUP_ISSUE_TRACKER_DOC = "SETUP_ISSUE_TRACKER.md";
-const SETUP_ISSUE_TRACKER_PATH = `.sandcastle/${SETUP_ISSUE_TRACKER_DOC}`;
+const SETUP_ISSUE_TRACKER_PATH = `.drover/${SETUP_ISSUE_TRACKER_DOC}`;
 
 export interface TemplateMetadata {
   name: string;
@@ -24,7 +24,7 @@ export interface TemplateMetadata {
    * Host-side npm packages the template's `main` file imports directly (e.g.
    * the planner templates import `zod` for their `<plan>` output schema). Init
    * offers to install these with the detected package manager so that
-   * `npx tsx .sandcastle/main.ts` doesn't crash with ERR_MODULE_NOT_FOUND.
+   * `npx tsx .drover/main.ts` doesn't crash with ERR_MODULE_NOT_FOUND.
    */
   dependencies?: readonly string[];
 }
@@ -74,7 +74,7 @@ export const getTemplateDependencies = (
 
 const PACKAGE_MANAGERS = ["npm", "pnpm", "yarn", "bun"] as const;
 
-/** A package manager Sandcastle can detect on the host and build install commands for. */
+/** A package manager Drover can detect on the host and build install commands for. */
 export type PackageManager = (typeof PACKAGE_MANAGERS)[number];
 
 // Lockfiles checked in priority order. bun.lock / bun.lockb are both valid bun
@@ -215,7 +215,7 @@ RUN apt-get update && apt-get install -y \\
 
 {{ISSUE_TRACKER_TOOLS}}
 
-# Build-args for UID/GID alignment: sandcastle docker build-image
+# Build-args for UID/GID alignment: drover docker build-image
 # defaults these to the host user's UID/GID so image-built files
 # and bind-mounted files share an owner without runtime chown.
 ARG AGENT_UID=1000
@@ -233,7 +233,7 @@ ENV PATH="/home/agent/.local/bin:$PATH"
 
 WORKDIR /home/agent
 
-# In worktree sandbox mode, Sandcastle bind-mounts the git worktree at ${SANDBOX_REPO_DIR}
+# In worktree sandbox mode, Drover bind-mounts the git worktree at ${SANDBOX_REPO_DIR}
 # and overrides the working directory to ${SANDBOX_REPO_DIR} at container start.
 # Structure your Dockerfile so that ${SANDBOX_REPO_DIR} can serve as the project root.
 ENTRYPOINT ["sleep", "infinity"]
@@ -250,7 +250,7 @@ RUN apt-get update && apt-get install -y \\
 
 {{ISSUE_TRACKER_TOOLS}}
 
-# Build-args for UID/GID alignment: sandcastle docker build-image
+# Build-args for UID/GID alignment: drover docker build-image
 # defaults these to the host user's UID/GID so image-built files
 # and bind-mounted files share an owner without runtime chown.
 ARG AGENT_UID=1000
@@ -266,7 +266,7 @@ USER \${AGENT_UID}:\${AGENT_GID}
 
 WORKDIR /home/agent
 
-# In worktree sandbox mode, Sandcastle bind-mounts the git worktree at ${SANDBOX_REPO_DIR}
+# In worktree sandbox mode, Drover bind-mounts the git worktree at ${SANDBOX_REPO_DIR}
 # and overrides the working directory to ${SANDBOX_REPO_DIR} at container start.
 # Structure your Dockerfile so that ${SANDBOX_REPO_DIR} can serve as the project root.
 ENTRYPOINT ["sleep", "infinity"]
@@ -283,7 +283,7 @@ RUN apt-get update && apt-get install -y \\
 
 {{ISSUE_TRACKER_TOOLS}}
 
-# Build-args for UID/GID alignment: sandcastle docker build-image
+# Build-args for UID/GID alignment: drover docker build-image
 # defaults these to the host user's UID/GID so image-built files
 # and bind-mounted files share an owner without runtime chown.
 ARG AGENT_UID=1000
@@ -299,7 +299,7 @@ USER \${AGENT_UID}:\${AGENT_GID}
 
 WORKDIR /home/agent
 
-# In worktree sandbox mode, Sandcastle bind-mounts the git worktree at ${SANDBOX_REPO_DIR}
+# In worktree sandbox mode, Drover bind-mounts the git worktree at ${SANDBOX_REPO_DIR}
 # and overrides the working directory to ${SANDBOX_REPO_DIR} at container start.
 # Structure your Dockerfile so that ${SANDBOX_REPO_DIR} can serve as the project root.
 ENTRYPOINT ["sleep", "infinity"]
@@ -316,7 +316,7 @@ RUN apt-get update && apt-get install -y \\
 
 {{ISSUE_TRACKER_TOOLS}}
 
-# Build-args for UID/GID alignment: sandcastle docker build-image
+# Build-args for UID/GID alignment: drover docker build-image
 # defaults these to the host user's UID/GID so image-built files
 # and bind-mounted files share an owner without runtime chown.
 ARG AGENT_UID=1000
@@ -334,7 +334,7 @@ ENV PATH="/home/agent/.local/bin:$PATH"
 
 WORKDIR /home/agent
 
-# In worktree sandbox mode, Sandcastle bind-mounts the git worktree at ${SANDBOX_REPO_DIR}
+# In worktree sandbox mode, Drover bind-mounts the git worktree at ${SANDBOX_REPO_DIR}
 # and overrides the working directory to ${SANDBOX_REPO_DIR} at container start.
 # Structure your Dockerfile so that ${SANDBOX_REPO_DIR} can serve as the project root.
 ENTRYPOINT ["sleep", "infinity"]
@@ -351,7 +351,7 @@ RUN apt-get update && apt-get install -y \\
 
 {{ISSUE_TRACKER_TOOLS}}
 
-# Build-args for UID/GID alignment: sandcastle docker build-image
+# Build-args for UID/GID alignment: drover docker build-image
 # defaults these to the host user's UID/GID so image-built files
 # and bind-mounted files share an owner without runtime chown.
 ARG AGENT_UID=1000
@@ -367,7 +367,7 @@ USER \${AGENT_UID}:\${AGENT_GID}
 
 WORKDIR /home/agent
 
-# In worktree sandbox mode, Sandcastle bind-mounts the git worktree at \${SANDBOX_REPO_DIR}
+# In worktree sandbox mode, Drover bind-mounts the git worktree at \${SANDBOX_REPO_DIR}
 # and overrides the working directory to \${SANDBOX_REPO_DIR} at container start.
 # Structure your Dockerfile so that \${SANDBOX_REPO_DIR} can serve as the project root.
 ENTRYPOINT ["sleep", "infinity"]
@@ -384,7 +384,7 @@ RUN apt-get update && apt-get install -y \\
 
 {{ISSUE_TRACKER_TOOLS}}
 
-# Build-args for UID/GID alignment: sandcastle docker build-image
+# Build-args for UID/GID alignment: drover docker build-image
 # defaults these to the host user's UID/GID so image-built files
 # and bind-mounted files share an owner without runtime chown.
 ARG AGENT_UID=1000
@@ -400,7 +400,7 @@ USER \${AGENT_UID}:\${AGENT_GID}
 
 WORKDIR /home/agent
 
-# In worktree sandbox mode, Sandcastle bind-mounts the git worktree at \${SANDBOX_REPO_DIR}
+# In worktree sandbox mode, Drover bind-mounts the git worktree at \${SANDBOX_REPO_DIR}
 # and overrides the working directory to \${SANDBOX_REPO_DIR} at container start.
 # Structure your Dockerfile so that \${SANDBOX_REPO_DIR} can serve as the project root.
 ENTRYPOINT ["sleep", "infinity"]
@@ -532,9 +532,9 @@ const ISSUE_TRACKER_REGISTRY: IssueTrackerEntry[] = [
     name: "github-issues",
     label: "GitHub Issues",
     templateArgs: {
-      LIST_TASKS_COMMAND: `gh issue list --state open --label Sandcastle --limit 100 --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'`,
+      LIST_TASKS_COMMAND: `gh issue list --state open --label Drover --limit 100 --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'`,
       VIEW_TASK_COMMAND: "gh issue view <ID>",
-      CLOSE_TASK_COMMAND: `gh issue close <ID> --comment "Completed by Sandcastle"`,
+      CLOSE_TASK_COMMAND: `gh issue close <ID> --comment "Completed by Drover"`,
       ISSUE_TRACKER_TOOLS: GITHUB_CLI_TOOLS,
     },
     envExample: `# GitHub personal access token — the agent uses it to read and manage GitHub Issues
@@ -548,7 +548,7 @@ GH_TOKEN=`,
     templateArgs: {
       LIST_TASKS_COMMAND: "bd ready --json",
       VIEW_TASK_COMMAND: "bd show <ID>",
-      CLOSE_TASK_COMMAND: `bd close <ID> --reason="Completed by Sandcastle"`,
+      CLOSE_TASK_COMMAND: `bd close <ID> --reason="Completed by Drover"`,
       ISSUE_TRACKER_TOOLS: BEADS_TOOLS,
     },
     envExample: "",
@@ -586,7 +586,7 @@ export const getAgent = (name: string): AgentEntry | undefined =>
 export interface SandboxProviderEntry {
   readonly name: string;
   readonly label: string;
-  /** Filename written to .sandcastle/ (e.g. "Dockerfile" or "Containerfile") */
+  /** Filename written to .drover/ (e.g. "Dockerfile" or "Containerfile") */
   readonly containerfileName: string;
   /** CLI namespace for build/remove commands (e.g. "docker" or "podman") */
   readonly cliNamespace: string;
@@ -637,13 +637,13 @@ export function getNextStepsLines(
       `2. Feed the setup prompt to ${agent.label} on your host to finish wiring it up:`,
       `   ${agent.setupCommand}`,
       `   (Runs on the host — you need the ${agent.label} CLI installed locally, since the sandbox image isn't built yet.)`,
-      `3. Follow .sandcastle/${SETUP_ISSUE_TRACKER_DOC} to edit the scaffolded files in place, build the image, and verify.`,
+      `3. Follow .drover/${SETUP_ISSUE_TRACKER_DOC} to edit the scaffolded files in place, build the image, and verify.`,
     ];
   }
   if (template === "blank") {
     const lines = [
       "Next steps:",
-      `1. Set the required env vars in .sandcastle/.env (see .sandcastle/.env.example)`,
+      `1. Set the required env vars in .drover/.env (see .drover/.env.example)`,
     ];
     if (agent.name === "claude-code") {
       lines.push(
@@ -651,10 +651,10 @@ export function getNextStepsLines(
       );
     }
     lines.push(
-      "2. Read and customize .sandcastle/prompt.md to describe what you want the agent to do",
-      `3. Customize .sandcastle/${mainFilename} — it uses the JS API (\`run()\`) to control how the agent runs`,
-      `4. Add "sandcastle": "npx tsx .sandcastle/${mainFilename}" to your package.json scripts`,
-      "5. Run `npm run sandcastle` to start the agent",
+      "2. Read and customize .drover/prompt.md to describe what you want the agent to do",
+      `3. Customize .drover/${mainFilename} — it uses the JS API (\`run()\`) to control how the agent runs`,
+      `4. Add "drover": "npx tsx .drover/${mainFilename}" to your package.json scripts`,
+      "5. Run `npm run drover` to start the agent",
     );
     return lines;
   } else {
@@ -663,7 +663,7 @@ export function getNextStepsLines(
     let step = 1;
     const lines: string[] = [
       "Next steps:",
-      `${step++}. Set the required env vars in .sandcastle/.env (see .sandcastle/.env.example)`,
+      `${step++}. Set the required env vars in .drover/.env (see .drover/.env.example)`,
     ];
     if (agent.name === "claude-code") {
       lines.push(
@@ -671,7 +671,7 @@ export function getNextStepsLines(
       );
     }
     lines.push(
-      `${step++}. Add "sandcastle": "npx tsx .sandcastle/${mainFilename}" to your package.json scripts`,
+      `${step++}. Add "drover": "npx tsx .drover/${mainFilename}" to your package.json scripts`,
       `${step++}. Templates use \`copyToWorktree: ["node_modules"]\` to copy your host node_modules into the sandbox for fast startup — the \`npm install\` in the onSandboxReady hook is a safety net for platform-specific binaries. Adjust both if you use a different package manager`,
     );
     if (usesPlanSchema) {
@@ -680,14 +680,14 @@ export function getNextStepsLines(
       );
     }
     lines.push(
-      `${step++}. Read and customize the prompt files in .sandcastle/ — they shape what the agent does`,
+      `${step++}. Read and customize the prompt files in .drover/ — they shape what the agent does`,
     );
     if (hasReviewer) {
       lines.push(
-        `${step++}. Customize .sandcastle/CODING_STANDARDS.md with your project's standards — the reviewer agent loads it during review`,
+        `${step++}. Customize .drover/CODING_STANDARDS.md with your project's standards — the reviewer agent loads it during review`,
       );
     }
-    lines.push(`${step++}. Run \`npm run sandcastle\` to start the agent`);
+    lines.push(`${step++}. Run \`npm run drover\` to start the agent`);
     return lines;
   }
 }
@@ -815,7 +815,7 @@ const rewriteMainTs = (
   });
 
 /**
- * When the user opted out of the Sandcastle label, strip ` --label Sandcastle`
+ * When the user opted out of the Drover label, strip ` --label Drover`
  * from all `.md` files in the scaffolded config directory so that `gh issue list`
  * commands work without a label filter.
  */
@@ -835,7 +835,7 @@ const rewritePromptFiles = (
           const content = yield* fs
             .readFileString(filePath)
             .pipe(Effect.mapError((e) => new Error(e.message)));
-          const updated = content.replace(/ --label Sandcastle/g, "");
+          const updated = content.replace(/ --label Drover/g, "");
           if (updated !== content) {
             yield* fs
               .writeFileString(filePath, updated)
@@ -918,7 +918,7 @@ const substituteTemplateArgs = (
 const buildSetupIssueTrackerDoc = (cliNamespace: string): string =>
   `# Set up your custom issue tracker
 
-You are a coding agent. Finish wiring up the **custom issue tracker** for this Sandcastle project. It was scaffolded in a deliberately broken-until-configured state: until you complete the steps below, every Sandcastle run hard-fails with a pointer back to this file.
+You are a coding agent. Finish wiring up the **custom issue tracker** for this Drover project. It was scaffolded in a deliberately broken-until-configured state: until you complete the steps below, every Drover run hard-fails with a pointer back to this file.
 
 ## Goal
 
@@ -949,22 +949,22 @@ Work out, together with the user, the shell commands for:
 
   with the install steps for your tracker's CLI (if it needs one).
 
-- **Prompt files (\`.sandcastle/*.md\`)** — replace the sentinel
+- **Prompt files (\`.drover/*.md\`)** — replace the sentinel
 
   \`\`\`
   ${CUSTOM_LIST_TASKS_SENTINEL}
   \`\`\`
 
-  with your **list** command. In the prompt file the sentinel sits inside a Sandcastle **shell expression** — a leading \`!\` followed by the command in backticks — whose output is injected into the prompt before each run. Keep that \`!\` and the surrounding backticks; replace only the command between them, and **remove the \`exit 1\`** (leaving it keeps every run hard-failing). Then replace the \`${CUSTOM_VIEW_TASK_MARKER}\` and \`${CUSTOM_CLOSE_TASK_MARKER}\` markers with your **view** and **close** commands.
+  with your **list** command. In the prompt file the sentinel sits inside a Drover **shell expression** — a leading \`!\` followed by the command in backticks — whose output is injected into the prompt before each run. Keep that \`!\` and the surrounding backticks; replace only the command between them, and **remove the \`exit 1\`** (leaving it keeps every run hard-failing). Then replace the \`${CUSTOM_VIEW_TASK_MARKER}\` and \`${CUSTOM_CLOSE_TASK_MARKER}\` markers with your **view** and **close** commands.
 
-- **\`.env.example\`** — replace the \`# TODO\` block with the real env var(s) your tracker needs, then tell the user to set them in \`.sandcastle/.env\`.
+- **\`.env.example\`** — replace the \`# TODO\` block with the real env var(s) your tracker needs, then tell the user to set them in \`.drover/.env\`.
 
 ## 4. Build the image
 
 Once the files are wired up, build the sandbox image:
 
 \`\`\`
-sandcastle ${cliNamespace} build-image
+drover ${cliNamespace} build-image
 \`\`\`
 
 ## 5. Verify
@@ -1028,7 +1028,7 @@ export const scaffold = (
       sandboxProvider = SANDBOX_PROVIDER_REGISTRY[0]!, // default: docker
     } = options;
     const fs = yield* FileSystem.FileSystem;
-    const configDir = join(repoDir, ".sandcastle");
+    const configDir = join(repoDir, ".drover");
 
     const exists = yield* fs
       .exists(configDir)
@@ -1036,7 +1036,7 @@ export const scaffold = (
     if (exists) {
       yield* Effect.fail(
         new Error(
-          ".sandcastle/ directory already exists. Remove it first if you want to re-initialize.",
+          ".drover/ directory already exists. Remove it first if you want to re-initialize.",
         ),
       );
     }
@@ -1087,7 +1087,7 @@ export const scaffold = (
     // Replace issue tracker template arguments in all text files (must run before label stripping)
     yield* substituteTemplateArgs(configDir, issueTracker);
 
-    // Strip --label Sandcastle from prompt files when the user declined label creation
+    // Strip --label Drover from prompt files when the user declined label creation
     if (!createLabel) {
       yield* rewritePromptFiles(configDir);
     }

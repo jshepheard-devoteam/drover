@@ -62,7 +62,7 @@ const defaultUidBuildArgs = (): Record<string, string> => {
 
 // --- Config directory check ---
 
-const CONFIG_DIR = ".sandcastle";
+const CONFIG_DIR = ".drover";
 
 const requireConfigDir = (
   cwd: string,
@@ -75,7 +75,7 @@ const requireConfigDir = (
     if (!exists) {
       yield* Effect.fail(
         new ConfigDirError({
-          message: "No .sandcastle/ found. Run `sandcastle init` first.",
+          message: "No .drover/ found. Run `drover init` first.",
         }),
       );
     }
@@ -122,7 +122,7 @@ const createLabelOption = Options.choice("create-label", [
   "false",
 ]).pipe(
   Options.withDescription(
-    'Whether to create the "Sandcastle" GitHub label (only meaningful with --issue-tracker github-issues)',
+    'Whether to create the "Drover" GitHub label (only meaningful with --issue-tracker github-issues)',
   ),
   Options.optional,
 );
@@ -393,7 +393,7 @@ const initCommand = Command.make(
         selectedTemplate = selected as string;
       }
 
-      // Offer to create the "Sandcastle" label on the repo (skip for non-GitHub issue trackers).
+      // Offer to create the "Drover" label on the repo (skip for non-GitHub issue trackers).
       // CLI flag > interactive confirm. The flag is only meaningful for the github-issues tracker.
       let shouldCreateLabel = false;
       if (selectedIssueTracker.name === "github-issues") {
@@ -401,7 +401,7 @@ const initCommand = Command.make(
           choice: createLabelChoice,
           flag: "--create-label",
           promptMessage:
-            'Create a "Sandcastle" GitHub label? (Templates filter issues by this label)',
+            'Create a "Drover" GitHub label? (Templates filter issues by this label)',
           cancelMessage: "Label selection cancelled.",
         });
 
@@ -409,7 +409,7 @@ const initCommand = Command.make(
           yield* Effect.try({
             try: () =>
               execSync(
-                'gh label create "Sandcastle" --description "Issues for Sandcastle to work on" --color "F9A825" 2>/dev/null',
+                'gh label create "Drover" --description "Issues for Drover to work on" --color "F9A825" 2>/dev/null',
                 { cwd, stdio: "ignore" },
               ),
             catch: () => undefined,
@@ -418,7 +418,7 @@ const initCommand = Command.make(
       }
 
       const scaffoldResult = yield* d.spinner(
-        "Scaffolding .sandcastle/ config directory...",
+        "Scaffolding .drover/ config directory...",
         scaffold(cwd, {
           agent: selectedAgent,
           model: selectedModel,
@@ -443,7 +443,7 @@ const initCommand = Command.make(
       // If the chosen template imports zod on the host (the planner templates
       // build their <plan> output schema with it) and the host doesn't already
       // declare it, offer to install it. Without this, the very first
-      // `npx tsx .sandcastle/main.ts` crashes with ERR_MODULE_NOT_FOUND.
+      // `npx tsx .drover/main.ts` crashes with ERR_MODULE_NOT_FOUND.
       if (getTemplateDependencies(selectedTemplate).includes("zod")) {
         const alreadyInstalled = yield* hostHasDependency(cwd, "zod");
         if (!alreadyInstalled) {
@@ -513,7 +513,7 @@ const initCommand = Command.make(
           );
         } else {
           yield* d.status(
-            `Init complete! Run \`sandcastle ${selectedSandboxProvider.cliNamespace} build-image\` to build the ${providerLabel} image later.`,
+            `Init complete! Run \`drover ${selectedSandboxProvider.cliNamespace} build-image\` to build the ${providerLabel} image later.`,
             "success",
           );
         }
@@ -681,19 +681,19 @@ const podmanCommand = Command.make("podman", {}, () =>
 
 // --- Root command ---
 
-const rootCommand = Command.make("sandcastle", {}, () =>
+const rootCommand = Command.make("drover", {}, () =>
   Effect.gen(function* () {
     const d = yield* Display;
-    yield* d.status(`Sandcastle v${VERSION}`, "info");
+    yield* d.status(`Drover v${VERSION}`, "info");
     yield* d.status("Use --help to see available commands.", "info");
   }),
 );
 
-export const sandcastle = rootCommand.pipe(
+export const drover = rootCommand.pipe(
   Command.withSubcommands([initCommand, dockerCommand, podmanCommand]),
 );
 
-export const cli = Command.run(sandcastle, {
-  name: "sandcastle",
+export const cli = Command.run(drover, {
+  name: "drover",
   version: VERSION,
 });

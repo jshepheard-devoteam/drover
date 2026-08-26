@@ -2,7 +2,7 @@
 
 ## Context
 
-When the **branch** strategy is used, the caller supplies a named branch and Sandcastle creates a worktree at `.sandcastle/worktrees/<name>/`. If a worktree for that branch already exists on disk (e.g. because the user re-ran the same command), the previous behaviour was to throw, with an opt-out via `throwOnDuplicateWorktree: false` that silently returned the existing worktree.
+When the **branch** strategy is used, the caller supplies a named branch and Drover creates a worktree at `.drover/worktrees/<name>/`. If a worktree for that branch already exists on disk (e.g. because the user re-ran the same command), the previous behaviour was to throw, with an opt-out via `throwOnDuplicateWorktree: false` that silently returned the existing worktree.
 
 Throw-by-default made the common "re-run the same command" case fail loudly, and the opt-out was unsafe — it silently handed the agent whatever arbitrary state happened to be in the worktree, including uncommitted work from a prior run that could be clobbered.
 
@@ -19,11 +19,11 @@ Remove `throwOnDuplicateWorktree` from `run()`, `createSandbox()`, `SandboxFacto
 
 "Dirty" is defined narrowly as uncommitted changes.
 
-On the **reuse path**, Sandcastle additionally **fast-forwards the worktree from `origin` when, and only when, it is safe**:
+On the **reuse path**, Drover additionally **fast-forwards the worktree from `origin` when, and only when, it is safe**:
 
 - `git fetch origin <branch>`, then `git merge --ff-only`.
 - The refresh runs **only** when the worktree is clean (no uncommitted changes) **and** the local branch is strictly behind `origin/<branch>` (a fast-forward is possible).
-- If the worktree is **dirty**, or the branch has **diverged** (unpushed commits — not fast-forwardable), or the **fetch fails** (e.g. offline), the refresh is skipped, the worktree is reused as-is, and Sandcastle logs why. A failed fetch is non-fatal; it never breaks the run.
+- If the worktree is **dirty**, or the branch has **diverged** (unpushed commits — not fast-forwardable), or the **fetch fails** (e.g. offline), the refresh is skipped, the worktree is reused as-is, and Drover logs why. A failed fetch is non-fatal; it never breaks the run.
 
 This refresh is the **default** — there is no opt-in flag. The only behaviour it changes versus pure reuse is "a clean, strictly-behind worktree now fast-forwards," which is the obviously-correct outcome; every case where reuse-as-is matters (unpushed commits, uncommitted work) is explicitly left untouched. Unpushed commits and branch drift against origin still do not count as "dirty" — they are normal for a long-lived named branch, and a diverged branch is reused exactly as it was.
 
