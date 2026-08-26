@@ -24,12 +24,54 @@ const usage = `Usage:
   drover-board skip <id> [--db <path>] [--note <text>]
   drover-board stop [--db <path>]
   drover-board dashboard [--db <path>] [--port <n>]
+  drover-board dashboard --config <repos.json> [--port <n>]
+
+--config points at a JSON file for managing multiple repos from one
+dashboard: [{"name": "repo-a", "dbPath": "/path/a/.drover/board.sqlite"}, ...]
 `;
 
 class CliUsageError extends Error {}
 
 const fail = (message: string): never => {
   throw new CliUsageError(message);
+};
+
+/** Validates the `--config` file's shape before opening anything. */
+const readDashboardConfig = (
+  configPath: string,
+): { name: string; dbPath: string }[] => {
+  if (!existsSync(configPath))
+    throw new CliUsageError(`No such file: ${configPath}`);
+  let raw: unknown;
+  try {
+    raw = JSON.parse(readFileSync(configPath, "utf8"));
+  } catch (error) {
+    throw new CliUsageError(
+      `Could not parse ${configPath} as JSON: ${(error as Error).message}`,
+    );
+  }
+  if (!Array.isArray(raw) || raw.length === 0) {
+    throw new CliUsageError(
+      `${configPath} must be a non-empty JSON array of {"name", "dbPath"}.`,
+    );
+  }
+  const seen = new Set<string>();
+  const entries = raw.map((entry: unknown) => {
+    const e = entry as Record<string, unknown>;
+    if (typeof e.name !== "string" || typeof e.dbPath !== "string") {
+      throw new CliUsageError(
+        `Each entry in ${configPath} needs string "name" and "dbPath": ${JSON.stringify(entry)}`,
+      );
+    }
+    if (seen.has(e.name)) {
+      throw new CliUsageError(
+        `Duplicate repo name "${e.name}" in ${configPath}.`,
+      );
+    }
+    seen.add(e.name);
+    return { name: e.name, dbPath: e.dbPath };
+  });
+  return entries;
 };
 
 const main = (): void => {
@@ -43,6 +85,7 @@ const main = (): void => {
       json: { type: "boolean", default: false },
       note: { type: "string" },
       port: { type: "string", default: String(DEFAULT_DASHBOARD_PORT) },
+      config: { type: "string" },
     },
     allowPositionals: true,
   } as const);
@@ -155,15 +198,25 @@ const main = (): void => {
       if (!Number.isInteger(port) || port <= 0) {
         throw new CliUsageError(`Invalid --port: ${values.port}`);
       }
-      const db = openBoard(values.db);
-      const server = createDashboardServer({ dbPath: values.db, db });
+
+      const repoSpecs: { name: string; dbPath: string }[] = values.config
+        ? readDashboardConfig(values.config)
+        : [{ name: values.db, dbPath: values.db }];
+
+      const repos = repoSpecs.map((spec) => ({
+        ...spec,
+        db: openBoard(spec.dbPath),
+      }));
+
+      const server = createDashboardServer({ repos });
       server.listen(port, "127.0.0.1", () => {
         console.log(
-          `Dashboard running at http://127.0.0.1:${port} (read-only, Ctrl-C to stop)`,
+          `Dashboard running at http://127.0.0.1:${port} (Ctrl-C to stop)`,
         );
+        for (const r of repos) console.log(`  ${r.name} -> ${r.dbPath}`);
       });
       // Deliberately no db.close()/return here — the listening server and
-      // open db handle are what keep the process alive.
+      // open db handles are what keep the process alive.
       return;
     }
 
